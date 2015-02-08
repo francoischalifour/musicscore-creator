@@ -1,0 +1,26 @@
+##############
+## Windows
+##############
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+##############
+## MacOS
+##############
+.DS_Store
+
+##############
+## Imports
+##############
+node_modules
+client/bower_components
+
+##############
+## Logs & errors
+##############
+*.log
+*.dmp

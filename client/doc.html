@@ -1,0 +1,47 @@
+<div id="page-content">
+    <h2>Documentation</h2>
+    <p>Music Score Creator makes it simple to create music sheets.</p>
+
+    <h3>Music basics</h3>
+
+    <h4>Bar-lines</h4>
+    <ul>
+        <li><code>|</code> Bar : separe the divisions of time</li>
+        <li><code>=||</code> Double Bar : divide one complete musical idea from another</li>
+        <li><code>=|:</code> Repeat Begin : repeat the piece from here</li>
+        <li><code>=:|</code> Repeat End : indicate that the music is to be repeated from a Repeat Begin Bar. If there are not, the music is repeated from the beginning</li>
+        <li><code>=::</code> Double Repeat : cf. repeat begin and repeat end</li>
+        <li><code>=|=</code> End Bar : indicate that the end of the piece has been reached</li>
+    </ul>
+
+    <h4>Durations</h4>
+    <ul>
+        <li>1 <strong>w</strong>hile note</li>
+        <li>2 <strong>h</strong>alf notes</li>
+        <li>4 <strong>q</strong>uarter notes</li>
+        <li>8 <strong>e</strong>ighth notes</li>
+        <li>16 <strong>s</strong>ixteenth notes</li>
+    </ul>
+
+    <h3>Examples</h3>
+
+    <h4>Basic example</h4>
+    <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100">tabstave notation=true tablature=false
+notes Cn-D-E/4 F#/5</div>
+
+    <h4>A Minor Pentatonic Scale</h4>
+    <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100">tabstave notation=true tablature=true
+notes 5/6 8/6 5/5 8/5 | 5/4 7/4 5/3 7/3 | 5/2 8/2 5/1 8/1 =:|</div>
+
+    <h4>Some chords</h4>
+    <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100">tabstave notation=true time=4/4
+notes :2 (7/4.5/3.5/2.5/1) (3/4.2/3.1/2.1/1) |
+notes :1 (3/1.3/2.4/3.5/4) =|=</div>
+
+    <h4>C Major Scale with text</h4>
+    <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100">tabstave notation=true tablature=false time=4/4 key=Ab tuning=eb
+notes :8 C-D-E-F-G-A-B/4 C/5
+text :8,.1,Do,Ré,Mi,.10,Fa,Sol,La,Si,.1,Do
+
+options space=18</div>
+</div>

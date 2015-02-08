@@ -1,0 +1,262 @@
+<link rel="import" href="../bower_components/paper-input/paper-autogrow-textarea.html">
+
+<polymer-element name="music-editor" attributes="notation tablature time clef key tuning">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+        .card {
+            display: block;
+            margin: 0 0 8px 0;
+            padding: 24px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            background-color: #fff;
+            -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+        }
+        @media(min-width:641px) {
+            .card {
+                margin: 8px;
+            }
+        }
+        .card-header {
+            font-size: 1.3em;
+            color: #263238;
+        }
+        h4 {
+            font-weight: 300;
+        }
+        paper-checkbox {
+            padding: 22px 22px 22px 0;
+        }
+        paper-input-decorator {
+            padding: 16px;
+            border: none;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            font-family: Monaco, Inconsolata, Consolas;
+            background-color: #f7f7f7;
+        }
+        paper-input-decorator /deep/ .unfocused-underline {
+            background: none;
+        }
+        paper-input-decorator /deep/ .focused-underline {
+            background: none;
+        }
+        </style>
+
+        <div horizontal layout wrap>
+            <div class="card" flex>
+
+                <div class="card-header">
+                    Settings
+                </div>
+
+                <div horizontal layout>
+                    <core-label horizontal layout flex>
+                        <paper-checkbox checked="{{notation}}" for></paper-checkbox>
+                        <div vertical layout>
+                            <h4>Notation</h4>
+                        </div>
+                    </core-label>
+
+                    <core-label horizontal layout flex>
+                        <paper-checkbox checked="{{tablature}}" for></paper-checkbox>
+                        <div vertical layout>
+                            <h4>Tablature</h4>
+                        </div>
+                    </core-label>
+                </div>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Clef</h4>
+                    </div>
+                    <div horizontal layout flex>
+                        <paper-dropdown-menu flex>
+                            <paper-dropdown class="dropdown">
+                                <core-menu selected="{{clef}}" valueattr="value" class="menu">
+                                    <template repeat="{{clef in clefs}}">
+                                        <paper-item value="{{clef.value}}" noink>{{clef.name}}</paper-item>
+                                    </template>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-dropdown-menu>
+                    </div>
+                </core-label>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Key</h4>
+                    </div>
+                    <div horizontal layout flex>
+                        <paper-dropdown-menu flex>
+                            <paper-dropdown class="dropdown">
+                                <core-menu selected="{{key}}" valueattr="value" class="menu">
+                                    <template repeat="{{key in keys}}">
+                                        <paper-item value="{{key.name}}" noink>{{key.name}}</paper-item>
+                                    </template>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-dropdown-menu>
+                    </div>
+                </core-label>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Time signature</h4>
+                    </div>
+                    <div horizontal layout flex>
+                        <paper-input value="{{time}}" label="C, C|, #/#" value="4/4" flex></paper-input>
+                    </div>
+                </core-label>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Tuning</h4>
+                    </div>
+                    <div horizontal layout flex>
+                        <paper-dropdown-menu flex>
+                            <paper-dropdown class="dropdown">
+                                <core-menu selected="{{tuning}}" valueattr="value" class="menu">
+                                    <template repeat="{{tunning in tunings}}">
+                                        <paper-item value="{{tunning.value}}" noink>{{tunning.name}}</paper-item>
+                                    </template>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-dropdown-menu>
+                    </div>
+                </core-label>
+            </div>
+
+            <div class="card" flex two>
+                <paper-input-decorator>
+                    <paper-autogrow-textarea>
+                        <textarea name="sheet" id="sheet">tabstave notation={{notation}} tablature={{tablature}} time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>
+                    </paper-autogrow-textarea>
+                </paper-input-decorator>
+            </div>
+        </div>
+
+    </template>
+    <script>
+    Polymer('music-editor', {
+        ready: function() {
+            this.notation = true;
+            this.tablature = false;
+            this.time = '4/4';
+            this.clef = 'treble';
+            this.key = 'C';
+            this.tuning = 'standard';
+
+            this.clefs = [{
+                'name': 'Treble',
+                'value': 'treble'
+            }, {
+                'name': 'Alto',
+                'value': 'alto'
+            }, {
+                'name': 'Tenor',
+                'value': 'tenor'
+            }, {
+                'name': 'Bass',
+                'value': 'bass'
+            }, {
+                'name': 'Percussion',
+                'value': 'percussion'
+            }];
+
+            this.keys = [{
+                'name': 'C'
+            }, {
+                'name': 'Am'
+            }, {
+                'name': 'F'
+            }, {
+                'name': 'Dm'
+            }, {
+                'name': 'Bb'
+            }, {
+                'name': 'Gm'
+            }, {
+                'name': 'Eb'
+            }, {
+                'name': 'Ab'
+            }, {
+                'name': 'Fm'
+            }, {
+                'name': 'Db'
+            }, {
+                'name': 'Bbm'
+            }, {
+                'name': 'Gb'
+            }, {
+                'name': 'Ebm'
+            }, {
+                'name': 'Cb'
+            }, {
+                'name': 'Abm'
+            }, {
+                'name': 'G'
+            }, {
+                'name': 'Em'
+            }, {
+                'name': 'D'
+            }, {
+                'name': 'Bm'
+            }, {
+                'name': 'A'
+            }, {
+                'name': 'F#m'
+            }, {
+                'name': 'E'
+            }, {
+                'name': 'C#m'
+            }, {
+                'name': 'B'
+            }, {
+                'name': 'G#m'
+            }, {
+                'name': 'F#'
+            }, {
+                'name': 'D#m'
+            }, {
+                'name': 'C#'
+            }, {
+                'name': 'A#m'
+            }];
+
+            this.tunings = [{
+                'name': 'Standard',
+                'value': 'standard'
+            }, {
+                'name': 'Drop D',
+                'value': 'dropd'
+            }, {
+                'name': 'Eb',
+                'value': 'Eb'
+            }, {
+                'name': 'E/5',
+                'value': 'E/5'
+            }, {
+                'name': 'B/4',
+                'value': 'B/4'
+            }, {
+                'name': 'G/4',
+                'value': 'G/4'
+            }, {
+                'name': 'D/4',
+                'value': 'D/4'
+            }, {
+                'name': 'A/3',
+                'value': 'A/3'
+            }, {
+                'name': 'E/3',
+                'value': 'E/3'
+            }];
+        }
+    });
+    </script>
+</polymer-element>

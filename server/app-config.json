@@ -1,0 +1,5 @@
+{
+    "mode": "development",
+    "port": 8080,
+    "server": "http://localhost"
+}

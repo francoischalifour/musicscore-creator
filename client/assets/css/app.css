@@ -1,0 +1,250 @@
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: RobotoDraft,Helvetica,Arial,sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 24px;
+    color: #444;
+    background-color: #fafafa;
+    transition: opacity ease-in 0.2s;
+}
+
+h1,
+h2,
+h3 {
+    font-weight: 300;
+}
+
+h1 {
+    font-size: 36px;
+}
+
+h2 {
+    font-size: 30px;
+}
+
+h3 {
+    font-size: 24px;
+}
+
+h4 {
+    font-size: 18px;
+    font-weight: 400;
+}
+
+a {
+    text-decoration: none;
+    color: #5677fc;
+}
+
+ul {
+    line-height: 32px;
+}
+
+/* ---------------------------------------------------- *\
+        App
+\* ---------------------------------------------------- */
+
+core-drawer-panel:not([narrow]) #navicon {
+    display: none;
+}
+
+core-header-panel {
+    background: #fafafa;
+}
+
+core-toolbar {
+    overflow: hidden;
+    color: #fff;
+    background-color: #263238;
+}
+
+@media(max-width:640px) {
+    #mainheader.tall {
+        height: auto;
+        margin-bottom: 4px;
+        line-height: inherit;
+    }
+
+    core-toolbar .header-title {
+        margin-top: -124px;
+        font-size: inherit;
+        font-weight: 400;
+    }
+
+    core-toolbar:not(.tall) .header-title {
+        margin-top: 4px;
+    }
+
+    core-toolbar .header-description {
+        display: none;
+    }
+}
+
+@media(min-width:639px) {
+    core-toolbar:not(.tall) .header-title {
+        font-size: inherit;
+        -webkit-transition: font-size .18s ease-in;
+        -moz-transition: font-size .18s ease-in;
+        -ms-transition: font-size .18s ease-in;
+        -o-transition: font-size .18s ease-in;
+        transition: font-size .18s ease-in;
+    }
+}
+
+#navmenu {
+    color: #666;
+    background-color: #fff;
+}
+
+#navheader {
+    overflow: hidden;
+    font-size: inherit;
+    color: #fff;
+    background-color: inherit;
+    background-color: #455a64;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode: multiply;
+}
+
+#navheader .middle img {
+    width: 84px;
+    height: 84px;
+}
+
+core-selector a {
+    color: #333;
+}
+
+/* ---------------------------------------------------- *\
+        Header
+\* ---------------------------------------------------- */
+
+.header-title {
+    font-size: 1.5em;
+}
+
+/* ---------------------------------------------------- *\
+        Menu
+\* ---------------------------------------------------- */
+
+core-menu {
+    margin: 0;
+}
+
+core-menu a {
+    color: #555;
+}
+
+core-menu > paper-item {
+    transition: all 300ms ease-in;
+}
+
+paper-item core-icon,
+paper-item img {
+    margin-right: 16px;
+    color: inherit;
+}
+
+.divider {
+    border-bottom: 1px solid #fafafa;
+}
+
+/* ---------------------------------------------------- *\
+        Core animated pages
+\* ---------------------------------------------------- */
+
+core-animated-pages {
+    width: 100%;
+    height: 100%;
+}
+
+/* ---------------------------------------------------- *\
+        Containers
+\* ---------------------------------------------------- */
+
+.content {
+    margin: 16px;
+}
+
+@media(min-width:768px) {
+    .content {
+        margin: 24px;
+    }
+}
+
+/* ---------------------------------------------------- *\
+        Cards
+\* ---------------------------------------------------- */
+
+.card {
+    display: block;
+    margin: 0 0 8px 0;
+    padding: 24px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    background-color: #fff;
+    -webkit-box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+}
+
+@media(min-width:641px) {
+    .card {
+        margin: 8px;
+    }
+}
+
+.card-header {
+    font-size: 1.3em;
+    color: #263238;
+}
+
+/* ---------------------------------------------------- *\
+        Alert messages
+\* ---------------------------------------------------- */
+
+paper-toast {
+    bottom: 24px;
+}
+
+/* ---------------------------------------------------- *\
+        VexFlow
+\* ---------------------------------------------------- */
+
+.editor-error:not(:empty) .text {
+    display: block;
+    margin-bottom: 8px;
+    padding: 16px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    color: #fff;
+    background-color: #ef5350;
+}
+
+textarea {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    font-family: Monaco,Inconsolata,Consolas;
+    background-color: #eee;
+    resize: vertical;
+}
+
+textarea:focus,
+textarea:active,
+textarea:hover {
+    outline: none;
+}

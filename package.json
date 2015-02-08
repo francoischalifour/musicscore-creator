@@ -1,0 +1,14 @@
+{
+  "name": "musicscore-creator",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prestart": "npm install",
+    "postinstall": "bower install",
+    "start": "node server/app"
+  },
+  "dependencies": {
+    "express": "~4.9.0",
+    "vextab": "^2.0.10"
+  }
+}

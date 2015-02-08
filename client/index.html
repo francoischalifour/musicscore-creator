@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#263238">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <title>Music Score Creator</title>
+
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="icon" sizes="192x192" href="assets/img/logo.png">
+
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+
+    <link rel="import" href="bower_components/flatiron-director/flatiron-director.html">
+    <link rel="import" href="bower_components/font-roboto/roboto.html">
+    <link rel="import" href="bower_components/core-elements/core-elements.html">
+    <link rel="import" href="bower_components/paper-elements/paper-elements.html">
+    <link rel="import" href="bower_components/core-animated-pages/core-animated-pages.html">
+    <link rel="import" href="bower_components/core-animated-pages/transitions/slide-from-right.html">
+
+    <link rel="import" href="elements/music-editor.html">
+    <link rel="import" href="elements/music-sheet.html">
+</head>
+
+<body fullbleed unresolved>
+    <template is="auto-binding" id="template">
+        <flatiron-director route="{{route}}" autoHash></flatiron-director>
+        <core-ajax id="ajax" auto url="{{selectedPage.page.url}}" handleAs="document" on-core-response="{{onResponse}}"></core-ajax>
+
+        <core-drawer-panel id="drawerPanel">
+
+            <core-header-panel drawer id="navmenu" mode="seamed">
+                <core-toolbar id="navheader" class="tall">
+                    <div class="middle" horizontal layout center-center fit>
+                        <a href="#home"><img src="assets/img/piano.svg" alt="Logo"></a>
+                    </div>
+                </core-toolbar>
+
+                <core-menu id="menu" valueattr="hash" selected="{{route}}" selectedModel="{{selectedPage}}" on-core-select="{{menuItemSelected}}" on-click="{{ajaxLoad}}">
+                    <template repeat="{{page, i in pages}}">
+                        <paper-item hash="{{page.hash}}" noink>
+                            <core-icon icon="{{page.icon}}"></core-icon>
+                            <a href="{{page.url}}">{{page.name}}</a>
+                        </paper-item>
+                    </template>
+                </core-menu>
+            </core-header-panel>
+
+            <core-header-panel main mode="waterfall-tall">
+                <core-toolbar id="mainheader">
+                    <paper-icon-button id="navicon" icon="menu" on-click="{{togglePanel}}"></paper-icon-button>
+                    <span class="header-title middle indent">Music Score Creator</span>
+                </core-toolbar>
+
+                <div class="content" layout horizontal center-center fit>
+                    <core-animated-pages id="pages" valueattr="hash" selected="{{route}}" transitions="slide-from-right">
+                        <template repeat="{{page, i in pages}}">
+                            <section hash="{{page.hash}}" layout vertical>
+                                <div>Loading...</div>
+                            </section>
+                        </template>
+                    </core-animated-pages>
+                </div>
+            </core-header-panel>
+
+        </core-drawer-panel>
+
+    </template>
+
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="assets/js/app-ajax.js"></script>
+</body>
+
+</html>
