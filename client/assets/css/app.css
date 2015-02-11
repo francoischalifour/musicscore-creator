@@ -248,3 +248,24 @@ textarea:active,
 textarea:hover {
     outline: none;
 }
+
+paper-checkbox {
+    padding: 26px 26px 26px 0;
+}
+
+paper-input-decorator {
+    padding: 16px;
+    border: none;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    font-family: Monaco,Inconsolata,Consolas;
+    background-color: #f7f7f7;
+}
+
+paper-input-decorator /deep/ .unfocused-underline {
+    background: none;
+}
+
+paper-input-decorator /deep/ .focused-underline {
+    background: none;
+}

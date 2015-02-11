@@ -6,32 +6,10 @@
         :host {
             display: block;
         }
-        .card {
-            display: block;
-            margin: 0 0 8px 0;
-            padding: 24px;
-            -webkit-border-radius: 2px;
-            border-radius: 2px;
-            background-color: #fff;
-            -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+        ::content paper-checkbox {
+            padding: 26px 26px 26px 0;
         }
-        @media(min-width:641px) {
-            .card {
-                margin: 8px;
-            }
-        }
-        .card-header {
-            font-size: 1.3em;
-            color: #263238;
-        }
-        h4 {
-            font-weight: 300;
-        }
-        paper-checkbox {
-            padding: 22px 22px 22px 0;
-        }
-        paper-input-decorator {
+        ::content paper-input-decorator {
             padding: 16px;
             border: none;
             -webkit-border-radius: 2px;
@@ -39,10 +17,10 @@
             font-family: Monaco, Inconsolata, Consolas;
             background-color: #f7f7f7;
         }
-        paper-input-decorator /deep/ .unfocused-underline {
+        ::content paper-input-decorator /deep/ .unfocused-underline {
             background: none;
         }
-        paper-input-decorator /deep/ .focused-underline {
+        ::content paper-input-decorator /deep/ .focused-underline {
             background: none;
         }
         </style>
