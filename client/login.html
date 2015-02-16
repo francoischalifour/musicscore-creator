@@ -16,24 +16,38 @@
             </div>
         </form>
         <script>
-        $(document).ready(function() {
-            $('#connexion').click(function(){
-                $.ajax({
-                    type: 'POST',
-                    url: '../temp.json',
-                    data: 'pseudo:'+$('#username')+(', password:')+$('#password'),
-                    timeout: 3000,
-                    success: function(data) {
-                        for (var i = 0; i < $data.length; i++) {
-                            alert($data[i].pseudo);
-                        };
-                    },
-                    error: function() {
-                        alert('Problème de connexion');
-                    }
-                })
+        var user = {
+            id: 1,
+            pseudo: 'Paris',
+            credit: 200,
+            password: 'mdp'
+        };
+
+
+        $(function() {
+            $('#connexion').click(function(event) {
+                event.preventDefault();
+
+                if (user.pseudo == $('#username').val() && user.password == $('#password').val()){
+                    $(location).attr('href','#home');
+                } else {
+                    alert('Erreur');
+                }
+
+                // $.ajax({
+                //     type: 'POST',
+                //     url: '../temp.json',
+                //     data: "{'pseudo':'"+$('#username').val()+"', 'password':'"+$('#password').val()+"'}",
+                //     timeout: 3000,
+                //     success: function(user) {
+
+                //     },
+                //     error: function() {
+                //         alert('Problème de connexion au serveur');
+                //     }
+                // });
             })
-        })
-    </script>
+        });
+        </script>
     </div>
 </div>
