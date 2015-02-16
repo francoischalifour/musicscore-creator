@@ -12,8 +12,28 @@
             </div>
 
             <div horizontal center-justified layout>
-                <button type="submit">Se connecter</button>
+                <button id='connexion' type="submit">Se connecter</button>
             </div>
         </form>
+        <script>
+        $(document).ready(function() {
+            $('#connexion').click(function(){
+                $.ajax({
+                    type: 'POST',
+                    url: '../temp.json',
+                    data: 'pseudo:'+$('#username')+(', password:')+$('#password'),
+                    timeout: 3000,
+                    success: function(data) {
+                        for (var i = 0; i < $data.length; i++) {
+                            alert($data[i].pseudo);
+                        };
+                    },
+                    error: function() {
+                        alert('Problème de connexion');
+                    }
+                })
+            })
+        })
+    </script>
     </div>
 </div>
