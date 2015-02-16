@@ -238,7 +238,7 @@ textarea {
     border: none;
     -webkit-border-radius: 2px;
     border-radius: 2px;
-    font-family: Monaco,Inconsolata,Consolas;
+    font-family: Monaco,Inconsolata,Consolas,sans-serif;
     background-color: #eee;
     resize: vertical;
 }

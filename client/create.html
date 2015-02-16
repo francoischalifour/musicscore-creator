@@ -9,7 +9,7 @@
                     Settings
                 </div>
 
-                <div horizontal layout>
+                <!-- <div horizontal layout>
                     <core-label horizontal layout flex>
                         <paper-checkbox checked="{{notation}}" for></paper-checkbox>
                         <div vertical layout>
@@ -23,7 +23,7 @@
                             <h4>Tablature</h4>
                         </div>
                     </core-label>
-                </div>
+                </div> -->
 
                 <core-label horizontal layout flex>
                     <div horizontal layout flex>
@@ -87,15 +87,23 @@
             </div>
 
             <div class="card" flex two>
-                <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100">tabstave notation=true tablature={{tablature}}
-notes :8 C-D-E-F-G-A-B/4 C/5
-text :8,.1,Do,Ré,Mi,.10,Fa,Sol,La,Si,.1,Do
-
-options space=18</div>
-                <!-- <textarea name="sheet" id="sheet">tabstave notation={{notation}} tablature={{tablature}} time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea> -->
+                <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100"></div>
+                <textarea name="sheet" id="sheet">tabstave notation=true tablature=false time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>
             </div>
         </div>
 
         <script src="assets/js/editor.js"></script>
+        <script>
+        $(function() {
+            $('#sheet').on('keyup', function() {
+                $('.editor').val($(this).val());
+                $('.editor').trigger(jQuery.Event('keyup'));
+            });
+
+            $('.card').on('change', function() {
+                $('#sheet').trigger(jQuery.Event('keyup'));
+            });
+        });
+        </script>
     </template>
 </div>

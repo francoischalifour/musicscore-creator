@@ -1,4 +1,4 @@
-$(function() {
+(function() {
     'use strict';
 
     var DEFAULT_ROUTE = 'home';
@@ -122,4 +122,4 @@ $(function() {
 
         this.injectBoundHTML(html, pages.selectedItem.firstElementChild);
     }
-});
+})();
