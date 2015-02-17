@@ -205,6 +205,17 @@ core-animated-pages {
     }
 }
 
+.card-md {
+    width: 100%;
+}
+
+@media(min-width:896px) {
+    .card-md {
+        width: 640px;
+        margin: 0 auto;
+    }
+}
+
 .card-header {
     font-size: 1.3em;
     color: #263238;
@@ -253,7 +264,7 @@ paper-checkbox {
     padding: 26px 26px 26px 0;
 }
 
-paper-input-decorator {
+/* paper-input-decorator {
     padding: 16px;
     border: none;
     -webkit-border-radius: 2px;
@@ -268,4 +279,4 @@ paper-input-decorator /deep/ .unfocused-underline {
 
 paper-input-decorator /deep/ .focused-underline {
     background: none;
-}
+} */

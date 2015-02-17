@@ -17,10 +17,10 @@
      * @param {string} url Page to show
      */
     template.pages = [{
-        name: 'Login',
-        hash: 'login',
-        icon: 'user',
-        url: './login.html'
+        name: 'Profile',
+        hash: 'profile',
+        icon: 'account-circle',
+        url: './profile.html'
     }, {
         name: 'Home',
         hash: 'home',
