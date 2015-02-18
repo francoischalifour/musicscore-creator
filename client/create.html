@@ -100,6 +100,10 @@
             </div>
 
             <div class="card" flex two>
+                <paper-button>
+                    <a href="#" id="downloadLink">Télécharger la partition</a>
+                </paper-button>
+                
                 <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100"></div>
                 <textarea name="sheet" id="sheet">tabstave notation=true tablature=false time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>
                 <textarea name="sheetTrans" id="sheetTrans">tabstave notation=true tablature=false time=4/4 key=C notes :8 C-D-E-F-G-A-B/4</textarea>
@@ -119,6 +123,15 @@
             $('.card').on('change', function() {
                 $('#sheet').trigger(jQuery.Event('keyup'));
             });
+        });
+
+
+        $('#downloadLink').on('click', function downloadToPng(e){
+            e.preventDefault();
+
+            var sheet = document.querySelector('.vex-canvas');
+
+            Canvas2Image.saveAsImage(sheet, sheet.width, sheet.height, 'png');
         });
         </script>
 
