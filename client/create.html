@@ -84,11 +84,25 @@
                         </paper-dropdown-menu>
                     </div>
                 </core-label>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Note</h4>
+                    </div>
+                    <div horizontal layout flex>
+                        <div horizontal layout flex>
+                            <paper-input value="C" label="Note" flex id="note"></paper-input>
+                            <paper-button onclick="transHigherUI()">+</paper-button>
+                            <paper-button onclick="transLowerUI()">-</paper-button>
+                        </div>
+                    </div>
+                </core-label>
             </div>
 
             <div class="card" flex two>
                 <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100"></div>
                 <textarea name="sheet" id="sheet">tabstave notation=true tablature=false time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>
+                <textarea name="sheetTrans" id="sheetTrans">tabstave notation=true tablature=false time=4/4 key=C notes :8 C-D-E-F-G-A-B/4</textarea>
             </div>
         </div>
 
@@ -103,6 +117,92 @@
             $('.card').on('change', function() {
                 $('#sheet').trigger(jQuery.Event('keyup'));
             });
+        });
+        </script>
+
+        <script>
+        var notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
+
+        function transHigherUI() {
+            var note = $('#note').val().toLowerCase();
+
+            var index = $.inArray(note, notes);
+            var start = note;
+
+            var next = notes[($.inArray(start, notes) + 1) % notes.length];
+
+            if (index !== -1) {
+                note = next.toUpperCase();
+                $('#note').val(note);
+            } else {
+                console.log('Note introuvable');
+            }
+        }
+
+        function transLowerUI() {
+            var note = $('#note').val().toLowerCase();
+
+            var index = $.inArray(note, notes);
+            var start = note;
+
+            var prev = notes[($.inArray(start, notes) - 1 + notes.length) % notes.length];
+
+            if (index !== -1) {
+                note = prev.toUpperCase();
+                $('#note').val(note);
+            } else {
+                console.log('Note introuvable');
+            }
+        }
+
+        function transHigher(note) {
+            var note = note.toLowerCase();
+
+            var index = $.inArray(note, notes);
+            var start = note;
+
+            var next = notes[($.inArray(start, notes) + 1) % notes.length];
+
+            if (index !== -1) {
+                return next.toUpperCase();
+            } else {
+                return 'ERROR';
+            }
+        }
+
+        function transLower(note) {
+            var note = note.toLowerCase();
+
+            var index = $.inArray(note, notes);
+            var start = note;
+
+            var prev = notes[($.inArray(start, notes) - 1 + notes.length) % notes.length];
+
+            if (index !== -1) {
+                return prev.toUpperCase();
+            } else {
+                return 'ERROR';
+            }
+        }
+
+        $(function() {
+            var sheet1 = $('#sheetTrans').val().split('notes');
+            console.log(sheet1[1]);
+            var sheet = sheet1[1].split('');
+            var sheet2 = $('#sheetTrans').val();
+            console.log(sheet);
+
+            console.log(sheet.length);
+            console.log(notes.length);
+
+            sheet.forEach(function(note) {
+                if (note.match(/[a-g]#?b?/i)) {
+                    console.log(transHigher(note));
+                    sheet2.replace(note, transHigher(note));
+                }
+            });
+
+            console.log(sheet2);
         });
         </script>
     </template>
