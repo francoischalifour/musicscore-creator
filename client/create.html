@@ -109,6 +109,8 @@
         <script src="assets/js/editor.js"></script>
         <script>
         $(function() {
+            'use strict';
+
             $('#sheet').on('keyup', function() {
                 $('.editor').val($(this).val());
                 $('.editor').trigger(jQuery.Event('keyup'));
@@ -123,7 +125,12 @@
         <script>
         var notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
 
+        /**
+         * Tranposes a note higher on the panel settings.
+         */
         function transHigherUI() {
+            'use strict';
+
             var note = $('#note').val().toLowerCase();
 
             var index = $.inArray(note, notes);
@@ -139,7 +146,12 @@
             }
         }
 
+        /**
+         * Transposes a note lower on the panel settings.
+         */
         function transLowerUI() {
+            'use strict';
+
             var note = $('#note').val().toLowerCase();
 
             var index = $.inArray(note, notes);
@@ -155,7 +167,14 @@
             }
         }
 
+        /**
+         * Transposes a note higher.
+         * @param  {string} note The note to transpose
+         * @return {string} the note higher
+         */
         function transHigher(note) {
+            'use strict';
+
             var note = note.toLowerCase();
 
             var index = $.inArray(note, notes);
@@ -170,7 +189,14 @@
             }
         }
 
+        /**
+         * Transposes a note lower.
+         * @param  {string} note The note to transpose
+         * @return {string} the note lower
+         */
         function transLower(note) {
+            'use strict';
+
             var note = note.toLowerCase();
 
             var index = $.inArray(note, notes);
@@ -185,8 +211,13 @@
             }
         }
 
+        /**
+         * Replaces all notes to transpose.
+         */
         $(function() {
-            var sheet1 = $('#sheetTrans').val().split('notes');
+            'use strict';
+
+            /*var sheet1 = $('#sheetTrans').val().split('notes');
             console.log(sheet1[1]);
             var sheet = sheet1[1].split('');
             var sheet2 = $('#sheetTrans').val();
@@ -202,7 +233,7 @@
                 }
             });
 
-            console.log(sheet2);
+            console.log(sheet2);*/
         });
         </script>
     </template>
