@@ -58,7 +58,7 @@
 
                 users.forEach(function(user) {
                     if (user.username == username && user.password == password) {
-                        $('#login').html('Connecté en tant que ' + user.username);
+                        $('#login').html('Connecté en tant que <span id="login.username">' + user.username + '</span>');
                         $(location).attr('href', '#home');
                         return;
                     }

@@ -85,13 +85,15 @@
 
             <div class="card" flex two>
                 <paper-button>
-                    <a href="#" id="downloadLink">Télécharger la partition</a>
+                    <a href="#" id="downloadLink">Download</a>
+                </paper-button>
+                <paper-button>
+                    <a href="#" id="shareLink">Share</a>
                 </paper-button>
 
                 <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100"></div>
                 <textarea name="sheet" id="sheet">tabstave notation=true tablature=false time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>
-                <textarea name="sheetTrans" id="sheetTrans">tabstave notation=true tablature=false time=4/4 key=C
-notes :8 C-D-E-F-G-A-B/4</textarea>
+                <textarea name="sheetTrans" id="sheetTrans">tabstave notation=true tablature=false time=4/4 key=C notes :8 C-D-E-F-G-A-B/4</textarea>
             </div>
         </div>
 
@@ -164,9 +166,34 @@ notes </textarea>
             </div>
         </div>
 
+       <paper-action-dialog backdrop layered="false" transition="core-transition-center" heading="Share" style="width: 640px;">
+            <form action="#" method="post">
+                <paper-input-decorator floatingLabel label="Email recipient's address">
+                    <input is="core-input" type="mail" name="destinataire" id="destinataire" required>
+                </paper-input-decorator>
+
+                <paper-input-decorator floatingLabel label="Description">
+                    <textarea is="core-input" name="description" id="description"></textarea>
+                </paper-input-decorator>
+
+                <div horizontal center-justified layout>
+                    <button type="submit" id="share" is="paper-button-submit">
+                        Share
+                    </button>
+                </div>
+            </form>
+
+            <paper-button affirmative autofocus>Fermer</paper-button>
+        </paper-action-dialog>
+
+        <paper-toast id="toast" text="Sheet music sent."></paper-toast>
+        <paper-toast id="toastError" text="The email recipient's address is not valid."></paper-toast>
+
         <script src="assets/js/editor.js"></script>
         <script src="assets/js/keyboard.js"></script>
         <script src="assets/js/download-sheet.js"></script>
+        <script src="assets/js/share-sheet.js"></script>
+
         <script>
         $(function() {
             'use strict';
@@ -274,27 +301,28 @@ notes </textarea>
         /**
          * Replaces all notes to transpose.
          */
-        $/*(function() {
-            'use strict';
+        $
+        /*(function() {
+                    'use strict';
 
-            var sheet1 = $('#sheetTrans').val().split('notes');
-            console.log(sheet1[1]);
-            var sheet = sheet1[1].split('');
-            var sheet2 = $('#sheetTrans').val();
-            console.log(sheet);
+                    var sheet1 = $('#sheetTrans').val().split('notes');
+                    console.log(sheet1[1]);
+                    var sheet = sheet1[1].split('');
+                    var sheet2 = $('#sheetTrans').val();
+                    console.log(sheet);
 
-            console.log(sheet.length);
-            console.log(notes.length);
+                    console.log(sheet.length);
+                    console.log(notes.length);
 
-            sheet.forEach(function(note) {
-                if (note.match(/[a-g]#?b?/i)) {
-                    console.log(transHigher(note));
-                    sheet2.replace(note, transHigher(note));
-                }
-            });
+                    sheet.forEach(function(note) {
+                        if (note.match(/[a-g]#?b?/i)) {
+                            console.log(transHigher(note));
+                            sheet2.replace(note, transHigher(note));
+                        }
+                    });
 
-            console.log(sheet2);
-        });*/
+                    console.log(sheet2);
+                });*/
         </script>
     </template>
 </div>
