@@ -115,4 +115,6 @@ $(function() {
         'name': 'E/3',
         'value': 'E/3'
     }];
+
+    template.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
 });
