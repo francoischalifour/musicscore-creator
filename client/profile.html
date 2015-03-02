@@ -34,15 +34,7 @@
                 var username = $('#username').val();
                 var password = $('#password').val();
 
-                users.forEach(function(user) {
-                    if (user.username == username && user.password == password) {
-                        $('#login').html('Connecté en tant que <span id="login.username">' + user.username + '</span>');
-                        $(location).attr('href', '#home');
-                        return;
-                    }
-                });
-
-                /*$.ajax({
+                $.ajax({
                     type: 'GET',
                     url: '/users.json',
                     dataType: 'json',
@@ -50,14 +42,14 @@
                         users.forEach(function(user) {
                             if (user.username == username && user.password == password) {
                                 $('#login').html('Connecté en tant que ' + user.username);
-                                $('#credit').html('Crédits = ' + user.credits);
+                                $('#login').append(' (' + user.credits + ' crédits)');
                                 $(location).attr('href', '#home');
                                 return;
                             }
                         });
                     },
                     error: function(err) {
-                        $().log('Problème de connexion au serveur');
+                        console.log('Problème de connexion au serveur');
                     }
                 });
             });
