@@ -2,6 +2,7 @@
 
 <polymer-element name="music-editor" attributes="notation tablature time clef key tuning">
     <template>
+
         <style>
         :host {
             display: block;
@@ -23,6 +24,153 @@
         ::content paper-input-decorator /deep/ .focused-underline {
             background: none;
         }
+        .card {
+            display: block;
+            margin: 0 0 8px 0;
+            padding: 24px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            background-color: #fff;
+            -webkit-box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+        }
+
+        @media(min-width:641px) {
+            .card {
+                margin: 8px;
+            }
+        }
+
+        .card-header {
+            font-size: 1.3em;
+            color: #263238;
+        }
+        .editor-error:not(:empty) .text {
+            display: block;
+            margin-bottom: 8px;
+            padding: 16px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            color: #fff;
+            background-color: #ef5350;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            font-family: Monaco,Inconsolata,Consolas,sans-serif;
+            background-color: #eee;
+            resize: vertical;
+        }
+
+        textarea:focus,
+        textarea:active,
+        textarea:hover {
+            outline: none;
+        }
+
+        paper-checkbox {
+            padding: 26px 26px 26px 0;
+        }
+
+        paper-input-decorator {
+            padding: 16px;
+            border: none;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            font-family: Monaco,Inconsolata,Consolas;
+            background-color: #f7f7f7;
+        }
+
+        paper-input-decorator /deep/ .unfocused-underline {
+            background: none;
+        }
+
+        paper-input-decorator /deep/ .focused-underline {
+            background: none;
+        }
+
+        #keyboard {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #keyboard li {
+            float: left;
+            width: 40px;
+            height: 40px;
+            margin: 0 5px 5px 0;
+            border: 1px solid #f9f9f9;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            text-align: center;
+            line-height: 40px;
+            background: #fafafa;
+        }
+
+        .capslock,
+        .tab,
+        .left-shift {
+            clear: left;
+        }
+
+        #keyboard .tab,
+        #keyboard .delete {
+            width: 70px;
+        }
+
+        #keyboard .capslock {
+            width: 80px;
+        }
+
+        #keyboard .return {
+            width: 77px;
+        }
+
+        #keyboard .left-shift {
+            width: 95px;
+        }
+
+        #keyboard .right-shift {
+            width: 109px;
+        }
+
+        .lastitem {
+            margin-right: 0;
+        }
+
+        .lastitem + li {
+            clear: left;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        #keyboard .space {
+            clear: left;
+            width: 681px;
+        }
+
+        .on {
+            display: none;
+        }
+
+        #keyboard li:hover {
+            position: relative;
+            background-color: #f7f7f7;
+            cursor: pointer;
+        }
+
+        #keyboard .category {
+            width: 92px;
+            background-color: #eee;
+            pointer-events: none;
+        }
         </style>
 
         <div horizontal layout wrap>
@@ -30,22 +178,6 @@
 
                 <div class="card-header">
                     Settings
-                </div>
-
-                <div horizontal layout>
-                    <core-label horizontal layout flex>
-                        <paper-checkbox checked="{{notation}}" for></paper-checkbox>
-                        <div vertical layout>
-                            <h4>Notation</h4>
-                        </div>
-                    </core-label>
-
-                    <core-label horizontal layout flex>
-                        <paper-checkbox checked="{{tablature}}" for></paper-checkbox>
-                        <div vertical layout>
-                            <h4>Tablature</h4>
-                        </div>
-                    </core-label>
                 </div>
 
                 <core-label horizontal layout flex>
@@ -107,18 +239,95 @@
                         </paper-dropdown-menu>
                     </div>
                 </core-label>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Note</h4>
+                    </div>
+                    <div horizontal layout flex>
+                        <div horizontal layout flex>
+                            <paper-input value="{{note}}" label="Note" flex id="note"></paper-input>
+                            <paper-button on-click="{{transHigherUI}}">+</paper-button>
+                            <paper-button on-click="{{transLowerUI}}">-</paper-button>
+                        </div>
+                    </div>
+                </core-label>
             </div>
 
             <div class="card" flex two>
-                <paper-input-decorator>
-                    <paper-autogrow-textarea>
-                        <textarea name="sheet" id="sheet">tabstave notation={{notation}} tablature={{tablature}} time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>
-                    </paper-autogrow-textarea>
-                </paper-input-decorator>
+                <paper-button>
+                    <a href="#" id="downloadLink">Télécharger la partition</a>
+                </paper-button>
+
+                <content></content>
             </div>
         </div>
 
+        <div layout horizontal>
+            <div class="card" flex>
+                <div class="card-header">Keyboard</div>
+
+                <ul id="keyboard" on-click="{{keyboardClick}}">
+                    <li class="category">Notes</li>
+                    <li class="note">A </li>
+                    <li class="note">B </li>
+                    <li class="note">C </li>
+                    <li class="note">D </li>
+                    <li class="note">E </li>
+                    <li class="note">F </li>
+                    <li class="note lastitem">G </li>
+
+                    <li class="category">Alterations</li>
+                    <li class="alteration">## </li>
+                    <li class="alteration"># </li>
+                    <li class="alteration">n </li>
+                    <li class="alteration">b </li>
+                    <li class="alteration lastitem">bb </li>
+
+                    <li class="category">Durations</li>
+                    <li class="duration">:1 </li>
+                    <li class="duration">:2 </li>
+                    <li class="duration">:4 </li>
+                    <li class="duration">:8 </li>
+                    <li class="duration">:16 </li>
+                    <li class="duration">:32 </li>
+                    <li class="duration">:64 </li>
+                    <li class="duration lastitem">:128 </li>
+
+                    <li class="category">Bars</li>
+                    <li class="bar"> | </li>
+                    <li class="bar"> =|| </li>
+                    <li class="bar"> =|: </li>
+                    <li class="bar"> =:| </li>
+                    <li class="bar"> =:: </li>
+                    <li class="bar lastitem"> =|= </li>
+
+                    <li class="category">Numbers</li>
+                    <li class="number">1</li>
+                    <li class="number">2</li>
+                    <li class="number">3</li>
+                    <li class="number">4</li>
+                    <li class="number">5</li>
+                    <li class="number">6</li>
+                    <li class="number">7</li>
+                    <li class="number">8</li>
+                    <li class="number">9</li>
+                    <li class="number lastitem">0</li>
+
+                    <li class="category">Characters</li>
+                    <li class="spechar">/</li>
+                    <li class="spechar lastitem">-</li>
+
+                    <li class="category">Options</li>
+                    <li class="delete">delete</li>
+                    <li class="return lastitem">return</li>
+
+                    <li class="space lastitem">&nbsp;</li>
+                </ul>
+            </div>
+        </div>
     </template>
+
     <script>
     Polymer('music-editor', {
         ready: function() {
@@ -128,6 +337,11 @@
             this.clef = 'treble';
             this.key = 'C';
             this.tuning = 'standard';
+
+            this.note = 'C ';
+            this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
+
+            this.write = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning + " \n notes " + this.note;
 
             this.clefs = [{
                 'name': 'Treble',
@@ -234,7 +448,149 @@
                 'name': 'E/3',
                 'value': 'E/3'
             }];
+        },
+
+        observe: {
+            'clef': 'updateData',
+            'time': 'updateData',
+            'key': 'updateData',
+            'tuning': 'updateData',
+            'note': 'updateData'
+        },
+
+        updateData: function (oldValue, newValue) {
+            $('.editor').val('tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning + "\n notes " + this.note);
+            $('.editor').trigger(jQuery.Event('keyup'));
+        },
+
+        /**
+         * Tranposes a note higher on the panel settings.
+         */
+        transHigherUI: function() {
+            'use strict';
+
+            var note = this.note.toLowerCase();
+
+            var index = $.inArray(note, this.notes);
+            var next = this.notes[($.inArray(note, this.notes) + 1) % this.notes.length];
+
+            if (index !== -1) {
+                note = next.toUpperCase();
+                this.note = note;
+            } else {
+                console.log('Note introuvable');
+            }
+        },
+
+        /**
+         * Transposes a note lower on the panel settings.
+         */
+        transLowerUI: function() {
+            'use strict';
+
+            var note = this.note.toLowerCase();
+
+            var index = $.inArray(note, this.notes);
+            var prev = this.notes[($.inArray(note, this.notes) - 1) % this.notes.length];
+
+            if (index !== -1) {
+                note = prev.toUpperCase();
+                this.note = note;
+            } else {
+                console.log('Note introuvable');
+            }
+        },
+
+        /**
+         * Transposes a note higher.
+         * @param  {string} note The note to transpose
+         * @return {string} the note higher
+         */
+        transHigher: function(note) {
+            'use strict';
+
+            var note = note.toLowerCase();
+
+            var index = $.inArray(note, notes);
+            var next = notes[($.inArray(note, notes) + 1) % notes.length];
+
+            if (index !== -1) {
+                return next.toUpperCase();
+            } else {
+                return 'ERROR';
+            }
+        },
+
+        /**
+         * Transposes a note lower.
+         * @param  {string} note The note to transpose
+         * @return {string} the note lower
+         */
+        transLower: function(note) {
+            'use strict';
+
+            var note = note.toLowerCase();
+
+            var index = $.inArray(note, notes);
+            var prev = notes[($.inArray(note, notes) - 1 + notes.length) % notes.length];
+
+            if (index !== -1) {
+                return prev.toUpperCase();
+            } else {
+                return 'ERROR';
+            }
+        },
+
+        /**
+         * Replaces all notes to transpose.
+         */
+        /*$(function() {
+            'use strict';
+
+            var sheet1 = $('#sheetTrans').val().split('notes');
+            console.log(sheet1[1]);
+            var sheet = sheet1[1].split('');
+            var sheet2 = $('#sheetTrans').val();
+            console.log(sheet);
+
+            console.log(sheet.length);
+            console.log(notes.length);
+
+            sheet.forEach(function(note) {
+                if (note.match(/[a-g]#?b?/i)) {
+                    console.log(transHigher(note));
+                    sheet2.replace(note, transHigher(note));
+                }
+            });
+
+            console.log(sheet2);
+        });*/
+
+        keyboardClick: function(element) {
+            'use strict';
+
+            var $this = element.toElement;
+            var character = $this.innerHTML;
+
+            // Delete
+            if ($this.classList.contains('delete')) {
+                this.note = '';
+                return;
+            }
+
+            // Special characters
+            if ($this.classList.contains('space')) character = ' ';
+            if ($this.classList.contains('tab')) character = "\t";
+            if ($this.classList.contains('return')) character = "\n";
+            if ($this.classList.contains('alteration') || $this.classList.contains('spechar')) {
+                this.note = '';
+            }
+
+            // Add the character
+            this.note = this.note + character;
         }
     });
     </script>
+    <!--<script src="../assets/js/keyboard.js"></script>-->
+    <script src="../assets/js/download-sheet.js"></script>
 </polymer-element>
