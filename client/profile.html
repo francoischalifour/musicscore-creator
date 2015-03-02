@@ -25,28 +25,6 @@
             'use strict';
 
             /**
-             * Users from the future database.
-             *
-             * @type {Array} User's data: id, username, password, credits
-             */
-            var users = [{
-                'id': '1',
-                'username': 'Paris',
-                'password': 'pass',
-                'credits': '150'
-            }, {
-                'id': '2',
-                'username': 'Imbert',
-                'password': 'mdp',
-                'credits': '200'
-            }, {
-                'id': '3',
-                'username': 'user',
-                'password': 'user',
-                'credits': '200'
-            }];
-
-            /**
              * Logs the user in.
              *
              * @param  {object} e The event
@@ -56,27 +34,25 @@
                 var username = $('#username').val();
                 var password = $('#password').val();
 
-                users.forEach(function(user) {
-                    if (user.username == username && user.password == password) {
-                        $('#login').html('Connecté en tant que ' + user.username);
-                        $(location).attr('href', '#home');
-                        return;
-                    }
-                });
-
-                /*$.ajax({
+                $.ajax({
                     type: 'GET',
                     url: '/users.json',
-                    data: 'username=' + username + '&password=' + password,
-                    timeout: 3000,
-                    success: function(user) {
-                        console.log('Connecté');
+                    dataType: 'json',
+                    success: function(users) {
+                        users.forEach(function(user) {
+                            if (user.username == username && user.password == password) {
+                                $('#login').html('Connecté en tant que ' + user.username);
+                                $('#credit').html('Crédits = ' + user.credits);
+                                $(location).attr('href', '#home');
+                                return;
+                            }
+                        });
                     },
                     error: function(err) {
-                        console.log('Problème de connexion au serveur');
+                        $().log('Problème de connexion au serveur');
                     }
-                });*/
-            })
+                });
+            });
         });
         </script>
     </div>
