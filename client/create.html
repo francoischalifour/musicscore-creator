@@ -1,109 +1,14 @@
 <div id="page-content">
     <h2>Create</h2>
 
-    <template is="auto-binding" id="template-editor">
-        <div horizontal layout wrap>
-            <div class="card" flex>
 
-                <div class="card-header">
-                    Settings
-                </div>
+    <music-editor>
+        <div class="vex-tabdiv" width="400" scale="1.0" editor="true" height="100">tabstave notation=true tablature=false time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</div>
+    </music-editor>
 
-                <!-- <div horizontal layout>
-                    <core-label horizontal layout flex>
-                        <paper-checkbox checked="{{notation}}" for></paper-checkbox>
-                        <div vertical layout>
-                            <h4>Notation</h4>
-                        </div>
-                    </core-label>
-
-                    <core-label horizontal layout flex>
-                        <paper-checkbox checked="{{tablature}}" for></paper-checkbox>
-                        <div vertical layout>
-                            <h4>Tablature</h4>
-                        </div>
-                    </core-label>
-                </div> -->
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Clef</h4>
-                    </div>
-                    <div horizontal layout flex>
-                        <paper-dropdown-menu flex>
-                            <paper-dropdown class="dropdown">
-                                <core-menu selected="{{clef}}" valueattr="value" class="menu">
-                                    <template repeat="{{clef in clefs}}">
-                                        <paper-item value="{{clef.value}}" noink>{{clef.name}}</paper-item>
-                                    </template>
-                                </core-menu>
-                            </paper-dropdown>
-                        </paper-dropdown-menu>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Key</h4>
-                    </div>
-                    <div horizontal layout flex>
-                        <paper-dropdown-menu flex>
-                            <paper-dropdown class="dropdown">
-                                <core-menu selected="{{key}}" valueattr="value" class="menu">
-                                    <template repeat="{{key in keys}}">
-                                        <paper-item value="{{key.name}}" noink>{{key.name}}</paper-item>
-                                    </template>
-                                </core-menu>
-                            </paper-dropdown>
-                        </paper-dropdown-menu>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Time signature</h4>
-                    </div>
-                    <div horizontal layout flex>
-                        <paper-input value="{{time}}" label="C, C|, #/#" value="4/4" flex></paper-input>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Tuning</h4>
-                    </div>
-                    <div horizontal layout flex>
-                        <paper-dropdown-menu flex>
-                            <paper-dropdown class="dropdown">
-                                <core-menu selected="{{tuning}}" valueattr="value" class="menu">
-                                    <template repeat="{{tunning in tunings}}">
-                                        <paper-item value="{{tunning.value}}" noink>{{tunning.name}}</paper-item>
-                                    </template>
-                                </core-menu>
-                            </paper-dropdown>
-                        </paper-dropdown-menu>
-                    </div>
-                </core-label>
-            </div>
-
-            <div class="card" flex two>
-                <div class="vex-tabdiv" width="800" scale="1.0" editor="true" editor_height="100"></div>
-                <textarea name="sheet" id="sheet">tabstave notation=true tablature=false time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>
-            </div>
-        </div>
-
-        <script src="assets/js/editor.js"></script>
-        <script>
-        $(function() {
-            $('#sheet').on('keyup', function() {
-                $('.editor').val($(this).val());
-                $('.editor').trigger(jQuery.Event('keyup'));
-            });
-
-            $('.card').on('change', function() {
-                $('#sheet').trigger(jQuery.Event('keyup'));
-            });
-        });
-        </script>
-    </template>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        console.log($('#sheet').val());
+    });
+    </script>
 </div>

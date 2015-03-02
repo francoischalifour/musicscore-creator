@@ -2,6 +2,7 @@
 
 <polymer-element name="music-editor" attributes="notation tablature time clef key tuning">
     <template>
+
         <style>
         :host {
             display: block;
@@ -23,6 +24,74 @@
         ::content paper-input-decorator /deep/ .focused-underline {
             background: none;
         }
+        .card {
+            display: block;
+            margin: 0 0 8px 0;
+            padding: 24px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            background-color: #fff;
+            -webkit-box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+        }
+
+        @media(min-width:641px) {
+            .card {
+                margin: 8px;
+            }
+        }
+
+        .card-header {
+            font-size: 1.3em;
+            color: #263238;
+        }
+        .editor-error:not(:empty) .text {
+            display: block;
+            margin-bottom: 8px;
+            padding: 16px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            color: #fff;
+            background-color: #ef5350;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            font-family: Monaco,Inconsolata,Consolas,sans-serif;
+            background-color: #eee;
+            resize: vertical;
+        }
+
+        textarea:focus,
+        textarea:active,
+        textarea:hover {
+            outline: none;
+        }
+
+        paper-checkbox {
+            padding: 26px 26px 26px 0;
+        }
+
+        paper-input-decorator {
+            padding: 16px;
+            border: none;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            font-family: Monaco,Inconsolata,Consolas;
+            background-color: #f7f7f7;
+        }
+
+        paper-input-decorator /deep/ .unfocused-underline {
+            background: none;
+        }
+
+        paper-input-decorator /deep/ .focused-underline {
+            background: none;
+        }
         </style>
 
         <div horizontal layout wrap>
@@ -32,7 +101,7 @@
                     Settings
                 </div>
 
-                <div horizontal layout>
+                <!-- <div horizontal layout>
                     <core-label horizontal layout flex>
                         <paper-checkbox checked="{{notation}}" for></paper-checkbox>
                         <div vertical layout>
@@ -46,7 +115,7 @@
                             <h4>Tablature</h4>
                         </div>
                     </core-label>
-                </div>
+                </div> -->
 
                 <core-label horizontal layout flex>
                     <div horizontal layout flex>
@@ -109,16 +178,14 @@
                 </core-label>
             </div>
 
+
             <div class="card" flex two>
-                <paper-input-decorator>
-                    <paper-autogrow-textarea>
-                        <textarea name="sheet" id="sheet">tabstave notation={{notation}} tablature={{tablature}} time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>
-                    </paper-autogrow-textarea>
-                </paper-input-decorator>
+                <content></content>
+                <!--<textarea name="sheet" id="sheet">tabstave notation=true tablature=false time={{time}} clef={{clef}} key={{key}} tuning={{tuning}}</textarea>-->
             </div>
         </div>
-
     </template>
+
     <script>
     Polymer('music-editor', {
         ready: function() {
@@ -234,6 +301,15 @@
                 'name': 'E/3',
                 'value': 'E/3'
             }];
+        },
+
+        observe: {
+            'clef': 'updateData'
+        },
+
+        updateData: function (oldValue, newValue) {
+            $('.editor').val('tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning);
+            $('.editor').trigger(jQuery.Event('keyup'));
         }
     });
     </script>
