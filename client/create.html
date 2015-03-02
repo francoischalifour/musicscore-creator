@@ -166,24 +166,17 @@ notes </textarea>
             </div>
         </div>
 
-       <paper-action-dialog backdrop layered="false" transition="core-transition-center" heading="Share" style="width: 640px;">
-            <form action="#" method="post">
-                <paper-input-decorator floatingLabel label="Email recipient's address">
-                    <input is="core-input" type="mail" name="destinataire" id="destinataire" required>
-                </paper-input-decorator>
+       <paper-action-dialog backdrop layered="false" transition="core-transition-center" heading="Share with others">
+            <paper-input-decorator floatingLabel label="Enter email addresses...">
+                <input is="core-input" type="mail" name="destinataire" id="destinataire" required>
+            </paper-input-decorator>
 
-                <paper-input-decorator floatingLabel label="Description">
-                    <textarea is="core-input" name="description" id="description"></textarea>
-                </paper-input-decorator>
+            <paper-input-decorator floatingLabel label="Incude a personal message...">
+                <textarea is="core-input" name="description" id="description"></textarea>
+            </paper-input-decorator>
 
-                <div horizontal center-justified layout>
-                    <button type="submit" id="share" is="paper-button-submit">
-                        Share
-                    </button>
-                </div>
-            </form>
-
-            <paper-button affirmative autofocus>Fermer</paper-button>
+            <paper-button id="shareAction" class="primary" affirmative>Share</paper-button>
+            <paper-button affirmative autofocus>Close</paper-button>
         </paper-action-dialog>
 
         <paper-toast id="toast" text="Sheet music sent."></paper-toast>

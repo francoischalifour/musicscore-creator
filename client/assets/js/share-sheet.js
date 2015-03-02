@@ -5,27 +5,30 @@ $(function() {
     'use strict';
 
     /**
-     * Toggles forbidden words dialog box.
+     * Toggles the share dialog box.
      */
-    document.getElementById('shareLink').onclick = function() {
+    $('#shareLink').on('click', function() {
         var dialog = document.querySelector('paper-action-dialog');
-        if (!dialog) {
+        if (!dialog)
             return;
-        }
-        dialog.toggle();
-    }
 
-    $('#share').on('click', function(e) {
+        dialog.toggle();
+    });
+
+    /**
+     * Sends a email with the music sheet.
+     *
+     * @param  {object} e The event
+     */
+    $('#shareAction').on('click', function(e) {
         e.preventDefault();
 
         var username = $('#login.username').val() || 'Un utilisateur';
         var destinataire = $('#destinataire').val();
         var description = $('#description').val();
 
-        console.log(username)
-
         if (!destinataire) {
-            document.getElementById('toastError').show()
+            document.getElementById('toastError').show();
             return;
         }
 
@@ -45,7 +48,7 @@ $(function() {
                 }
             }
         }).done(function() {
-            console.log('Reçu');
+            console.log('Sheet music sent.');
             document.getElementById('toast').show();
         });
     });

@@ -281,9 +281,23 @@ paper-checkbox {
 }
 
 /* ---------------------------------------------------- *\
-        Share panel
+        Dialogs
 \* ---------------------------------------------------- */
 
-#sharePanel {
-    display: none;
+paper-action-dialog {
+    width: 100%;
+}
+
+@media(min-width:640px) {
+    paper-action-dialog {
+        max-width: 640px;
+    }
+}
+
+/* ---------------------------------------------------- *\
+        Papper buttons
+\* ---------------------------------------------------- */
+
+.primary {
+    color: #2196f3;
 }
