@@ -1,19 +1,23 @@
 /**
  * Sends the music sheet.
+ * UNUSED ANYMORE
  */
-$(function() {
+(function() {
     'use strict';
+
+    console.log('Share sheet');
 
     /**
      * Toggles the share dialog box.
      */
-    $('#shareLink').on('click', function() {
+    document.getElementById('shareLink').onclick = function() {
+        console.log('dialog');
         var dialog = document.querySelector('paper-action-dialog');
         if (!dialog)
             return;
 
         dialog.toggle();
-    });
+    }
 
     /**
      * Sends a email with the music sheet.
@@ -52,4 +56,4 @@ $(function() {
             document.getElementById('toast').show();
         });
     });
-});
+})();

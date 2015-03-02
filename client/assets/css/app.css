@@ -167,8 +167,7 @@ core-menu > paper-item {
     transition: all 300ms ease-in;
 }
 
-paper-item core-icon,
-paper-item img {
+core-icon {
     margin-right: 16px;
     color: inherit;
 }
