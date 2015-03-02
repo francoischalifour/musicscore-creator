@@ -100,6 +100,10 @@ core-toolbar {
         -o-transition: font-size .18s ease-in;
         transition: font-size .18s ease-in;
     }
+
+    core-toolbar:not(.tall) .header-description {
+        display: none;
+    }
 }
 
 #navmenu {
@@ -133,6 +137,18 @@ core-selector a {
 
 .header-title {
     font-size: 1.5em;
+}
+
+.header-description {
+    display: none;
+    font-size: .9em;
+    opacity: .9;
+}
+
+@media(min-width:640px) {
+    .header-description {
+        display: block;
+    }
 }
 
 /* ---------------------------------------------------- *\

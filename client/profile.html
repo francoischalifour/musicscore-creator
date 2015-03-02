@@ -8,7 +8,7 @@
             </paper-input-decorator>
 
             <paper-input-decorator floatingLabel label="Password">
-                <input is="core-input" name="password" id="password">
+                <input is="core-input" name="password" id="password" type="password">
             </paper-input-decorator>
 
             <div horizontal center-justified layout>
@@ -58,6 +58,7 @@
 
                 users.forEach(function(user) {
                     if (user.username == username && user.password == password) {
+                        $('#login').html('Connecté en tant que ' + user.username);
                         $(location).attr('href', '#home');
                         return;
                     }
