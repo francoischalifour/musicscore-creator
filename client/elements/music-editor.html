@@ -7,12 +7,10 @@
         :host {
             display: block;
         }
-
         a {
             text-decoration: none;
             color: #5677fc;
         }
-
         .card {
             display: block;
             margin: 0 0 8px 0;
@@ -20,21 +18,18 @@
             -webkit-border-radius: 2px;
             border-radius: 2px;
             background-color: #fff;
-            -webkit-box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
-            box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+            -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
         }
-
         @media(min-width:641px) {
             .card {
                 margin: 8px;
             }
         }
-
         .card-header {
             font-size: 1.3em;
             color: #263238;
         }
-
         .editor-error:not(:empty) .text {
             display: block;
             margin-bottom: 8px;
@@ -44,57 +39,47 @@
             color: #fff;
             background-color: #ef5350;
         }
-
         .editor {
             width: 100%;
             padding: 16px;
             border: none;
             -webkit-border-radius: 2px;
             border-radius: 2px;
-            font-family: Monaco,Inconsolata,Consolas,sans-serif;
+            font-family: Monaco, Inconsolata, Consolas, sans-serif;
             background-color: #eee;
             resize: vertical;
         }
-
         .editor:focus,
         .editor:active,
         .editor:hover {
             outline: none;
         }
-
         paper-button {
             transition: background-color ease .15s;
         }
-
         paper-button:hover {
             background: #eee;
         }
-
         .primary {
             color: #2196f3;
         }
-
         paper-action-dialog {
             width: 100%;
         }
-
         @media(min-width:640px) {
             paper-action-dialog {
                 max-width: 640px;
             }
         }
-
         core-icon {
             margin-right: 16px;
             color: inherit;
         }
-
         #keyboard {
             margin: 0;
             padding: 0;
             list-style: none;
         }
-
         #keyboard li {
             float: left;
             width: 40px;
@@ -107,61 +92,48 @@
             line-height: 40px;
             background: #fafafa;
         }
-
         .capslock,
         .tab,
         .left-shift {
             clear: left;
         }
-
         #keyboard .tab,
         #keyboard .delete {
             width: 70px;
         }
-
         #keyboard .capslock {
             width: 80px;
         }
-
         #keyboard .return {
             width: 77px;
         }
-
         #keyboard .left-shift {
             width: 95px;
         }
-
         #keyboard .right-shift {
             width: 109px;
         }
-
         .lastitem {
             margin-right: 0;
         }
-
         .lastitem + li {
             clear: left;
         }
-
         .uppercase {
             text-transform: uppercase;
         }
-
         #keyboard .space {
             clear: left;
             width: 681px;
         }
-
         .on {
             display: none;
         }
-
         #keyboard li:hover {
             position: relative;
             background-color: #f7f7f7;
             cursor: pointer;
         }
-
         #keyboard .category {
             width: 92px;
             background-color: #eee;
@@ -175,6 +147,17 @@
                 <div class="card-header">
                     Settings
                 </div>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Name</h4>
+                    </div>
+                    <div horizontal layout flex>
+                        <div horizontal layout flex>
+                            <paper-input value="{{name}}" label="Name" flex></paper-input>
+                        </div>
+                    </div>
+                </core-label>
 
                 <core-label horizontal layout flex>
                     <div horizontal layout flex>
@@ -251,15 +234,21 @@
             </div>
 
             <div class="card" flex two>
-                <div horizontal end-justified layout>
-                    <paper-button on-click="{{downloadSheet}}">
-                        <core-icon icon="file-download"></core-icon>
-                        Download
-                    </paper-button>
-                    <paper-button on-click="{{shareSheet}}">
-                        <core-icon icon="social:person-add"></core-icon>
-                        Share
-                    </paper-button>
+                <div horizontal justified layout>
+                    <div horizontal start-justified layout>
+                        <div class="card-header">{{name}}</div>
+                    </div>
+
+                    <div horizontal end-justified layout>
+                        <paper-button on-click="{{downloadSheet}}">
+                            <core-icon icon="file-download"></core-icon>
+                            Download
+                        </paper-button>
+                        <paper-button on-click="{{shareSheet}}">
+                            <core-icon icon="social:person-add"></core-icon>
+                            Share
+                        </paper-button>
+                    </div>
                 </div>
 
                 <content></content>
@@ -333,7 +322,7 @@
         </div>
 
         <paper-action-dialog backdrop layered="false" transition="core-transition-center" heading="Share with others">
-            <paper-input-decorator floatingLabel label="Enter email addresses...">
+            <paper-input-decorator floatingLabel label="Enter email address...">
                 <input is="core-input" type="mail" name="destinataire" value="{{destinataire}}" required>
             </paper-input-decorator>
 
@@ -341,12 +330,13 @@
                 <textarea is="core-input" name="description" value="{{description}}"></textarea>
             </paper-input-decorator>
 
-            <paper-button class="primary" affirmative on-click="{{sendSheet}}">Share</paper-button>
-            <paper-button affirmative autofocus>Close</paper-button>
+            <paper-button affirmative>Close</paper-button>
+            <paper-button class="primary" affirmative autofocus on-click="{{sendSheet}}">Share</paper-button>
         </paper-action-dialog>
 
         <paper-toast id="toast" text="Sheet music sent."></paper-toast>
-        <paper-toast id="toastError" text="The email recipient's address is not valid."></paper-toast>
+        <paper-toast id="toastNoDest" text="The email recipient's address is not valid."></paper-toast>
+        <paper-toast id="toastError" text="Something went wrong."></paper-toast>
     </template>
 
     <script>
@@ -493,24 +483,40 @@
         },
 
         downloadSheet: function() {
-            this.sheet = document.querySelector('.vex-canvas');
+            this.canvas = document.querySelector('.vex-canvas');
+            this.context = this.canvas.getContext('2d');
 
-            Canvas2Image.saveAsImage(this.sheet, this.sheet.width, this.sheet.height, 'png');
+            // Fill the background with white.
+            this.context.globalCompositeOperation = 'destination-over';
+            this.context.fillStyle = '#fff';
+            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Convert to image and give a filename.
+            this.img = this.canvas.toDataURL('image/jpeg', 1.0);
+            this.filename = this.name || 'musicsheet';
+
+            // Create the PDF.
+            this.pdf = jsPDF();
+
+            // Create music sheet information.
+            this.pdf.setFontSize(22);
+            this.pdf.text(25, 25, this.name);
+            this.pdf.setFontSize(12);
+            this.pdf.setTextColor(150);
+            this.pdf.text(25, 32, 'Written with MusicScore Creator');
+
+            // Add the information to the PDF.
+            this.pdf.addImage(this.img, 'JPEG', 10, 40);
+            this.pdf.save(this.filename + '.pdf');
         },
 
         sendSheet: function() {
-            console.log('Send sheet');
-            console.log(this.destinataire);
-            console.log(this.description);
-
-            this.username = 'Un utilisateur';
-
             if (!this.destinataire) {
-                this.shadowRoot.querySelector('#toastError').show();
+                this.shadowRoot.querySelector('#toastNoDest').show();
                 return;
             }
 
-            console.log("Vers l'envoi");
+            this.username = 'Un utilisateur';
 
             $.ajax({
                 url: 'https://mandrillapp.com/api/1.0/messages/send.json',
@@ -530,6 +536,9 @@
             }).done(function() {
                 console.log('Sheet music sent.');
                 this.shadowRoot.querySelector('#toast').show();
+            }).fail(function() {
+                console.log('Something went wrong.');
+                this.shadowRoot.querySelector('#toastError').show();
             });
         },
 
@@ -661,7 +670,4 @@
         }
     });
     </script>
-
-    <script src="../assets/js/download-sheet.js"></script>
-    <script src="../assets/js/share-sheet.js"></script>
 </polymer-element>
