@@ -7,12 +7,10 @@
         :host {
             display: block;
         }
-
         a {
             text-decoration: none;
             color: #5677fc;
         }
-
         .card {
             display: block;
             margin: 0 0 8px 0;
@@ -20,21 +18,18 @@
             -webkit-border-radius: 2px;
             border-radius: 2px;
             background-color: #fff;
-            -webkit-box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
-            box-shadow: 0 2px 4px 0 rgba(0,0,0,.1);
+            -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
         }
-
         @media(min-width:641px) {
             .card {
                 margin: 8px;
             }
         }
-
         .card-header {
             font-size: 1.3em;
             color: #263238;
         }
-
         .editor-error:not(:empty) .text {
             display: block;
             margin-bottom: 8px;
@@ -44,57 +39,47 @@
             color: #fff;
             background-color: #ef5350;
         }
-
         .editor {
             width: 100%;
             padding: 16px;
             border: none;
             -webkit-border-radius: 2px;
             border-radius: 2px;
-            font-family: Monaco,Inconsolata,Consolas,sans-serif;
+            font-family: Monaco, Inconsolata, Consolas, sans-serif;
             background-color: #eee;
             resize: vertical;
         }
-
         .editor:focus,
         .editor:active,
         .editor:hover {
             outline: none;
         }
-
         paper-button {
             transition: background-color ease .15s;
         }
-
         paper-button:hover {
             background: #eee;
         }
-
         .primary {
             color: #2196f3;
         }
-
         paper-action-dialog {
             width: 100%;
         }
-
         @media(min-width:640px) {
             paper-action-dialog {
                 max-width: 640px;
             }
         }
-
         core-icon {
             margin-right: 16px;
             color: inherit;
         }
-
         #keyboard {
             margin: 0;
             padding: 0;
             list-style: none;
         }
-
         #keyboard li {
             float: left;
             width: 40px;
@@ -107,18 +92,15 @@
             line-height: 40px;
             background: #fafafa;
         }
-
         .capslock,
         .tab,
         .left-shift {
             clear: left;
         }
-
         #keyboard .tab,
         #keyboard .delete {
             width: 70px;
         }
-
         #keyboard .capslock {
             width: 80px;
         }
@@ -127,36 +109,28 @@
         #keyboard .erase {
             width: 77px;
         }
-
         #keyboard .left-shift {
             width: 95px;
         }
-
         #keyboard .right-shift {
             width: 109px;
         }
-
         .lastitem {
             margin-right: 0;
         }
-
         .lastitem + li {
             clear: left;
         }
-
         .uppercase {
             text-transform: uppercase;
         }
-
         #keyboard .space {
             clear: left;
             width: 681px;
         }
-
         .on {
             display: none;
         }
-
         #keyboard li:hover {
             position: relative;
             background-color: #f1f1f1;
@@ -184,6 +158,17 @@
                 <div class="card-header">
                     Settings
                 </div>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Name</h4>
+                    </div>
+                    <div horizontal layout flex>
+                        <div horizontal layout flex>
+                            <paper-input value="{{name}}" label="Name" flex></paper-input>
+                        </div>
+                    </div>
+                </core-label>
 
                 <core-label horizontal layout flex>
                     <div horizontal layout flex>
@@ -260,15 +245,21 @@
             </div>
 
             <div class="card" flex two>
-                <div horizontal end-justified layout>
-                    <paper-button on-click="{{downloadSheet}}">
-                        <core-icon icon="file-download"></core-icon>
-                        Download
-                    </paper-button>
-                    <paper-button on-click="{{shareSheet}}">
-                        <core-icon icon="social:person-add"></core-icon>
-                        Share
-                    </paper-button>
+                <div horizontal justified layout>
+                    <div horizontal start-justified layout>
+                        <div class="card-header">{{name}}</div>
+                    </div>
+
+                    <div horizontal end-justified layout>
+                        <paper-button on-click="{{downloadSheet}}">
+                            <core-icon icon="file-download"></core-icon>
+                            Download
+                        </paper-button>
+                        <paper-button on-click="{{shareSheet}}">
+                            <core-icon icon="social:person-add"></core-icon>
+                            Share
+                        </paper-button>
+                    </div>
                 </div>
 
                 <content></content>
@@ -333,7 +324,7 @@
         </div>
 
         <paper-action-dialog backdrop layered="false" transition="core-transition-center" heading="Share with others">
-            <paper-input-decorator floatingLabel label="Enter email addresses...">
+            <paper-input-decorator floatingLabel label="Enter email address...">
                 <input is="core-input" type="mail" name="destinataire" value="{{destinataire}}" required>
             </paper-input-decorator>
 
@@ -341,12 +332,13 @@
                 <textarea is="core-input" name="description" value="{{description}}"></textarea>
             </paper-input-decorator>
 
-            <paper-button class="primary" affirmative on-click="{{sendSheet}}">Share</paper-button>
-            <paper-button affirmative autofocus>Close</paper-button>
+            <paper-button affirmative>Close</paper-button>
+            <paper-button class="primary" affirmative autofocus on-click="{{sendSheet}}">Share</paper-button>
         </paper-action-dialog>
 
         <paper-toast id="toast" text="Sheet music sent."></paper-toast>
-        <paper-toast id="toastError" text="The email recipient's address is not valid."></paper-toast>
+        <paper-toast id="toastNoDest" text="The email recipient's address is not valid."></paper-toast>
+        <paper-toast id="toastError" text="Something went wrong."></paper-toast>
     </template>
 
     <script>
@@ -564,24 +556,58 @@
         },
 
         downloadSheet: function() {
-            this.sheet = document.querySelector('.vex-canvas');
+            this.canvas = document.querySelector('.vex-canvas');
+            this.context = this.canvas.getContext('2d');
 
-            Canvas2Image.saveAsImage(this.sheet, this.sheet.width, this.sheet.height, 'png');
+            // Fill the background with white.
+            this.context.globalCompositeOperation = 'destination-over';
+            this.context.fillStyle = '#fff';
+            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Convert to image and give a filename.
+            this.img = this.canvas.toDataURL('image/jpeg', 1.0);
+            this.filename = this.name || 'musicsheet';
+
+            // Create the PDF.
+            this.pdf = jsPDF();
+
+            // Create music sheet information.
+            this.pdf.setFontSize(22);
+            this.pdf.text(25, 25, this.name);
+            this.pdf.setFontSize(12);
+            this.pdf.setTextColor(150);
+            this.pdf.text(25, 32, 'Written with MusicScore Creator');
+
+            // Add the information to the PDF.
+            this.pdf.addImage(this.img, 'JPEG', 25, 40);
+            this.pdf.save(this.filename + '.pdf');
         },
 
+        /**
+         * Sends the music sheet via email.
+         */
         sendSheet: function() {
-            console.log('Send sheet');
-            console.log(this.destinataire);
-            console.log(this.description);
-
-            this.username = 'Un utilisateur';
-
+            // Abort if there is no recipient.
             if (!this.destinataire) {
-                this.shadowRoot.querySelector('#toastError').show();
+                this.shadowRoot.querySelector('#toastNoDest').show();
                 return;
             }
 
-            console.log("Vers l'envoi");
+            this.username = 'A user';
+
+            if (!this.description)
+                this.description = '';
+
+            // Prepare the music sheet converted to image.
+            this.canvas = document.querySelector('.vex-canvas');
+            this.context = this.canvas.getContext('2d');
+            this.img = this.canvas.toDataURL('image/jpeg', 1.0);
+
+            // To attach the PDF (TODO).
+            // this.pdfBase64 = this.pdf.output('datauristring');
+
+            // Stock the pointer to use in the Ajax element.
+            var polymer = this;
 
             $.ajax({
                 url: 'https://mandrillapp.com/api/1.0/messages/send.json',
@@ -589,18 +615,20 @@
                     'key': 'VzH_MdGdZGIpXEbE_LdjHA',
                     'message': {
                         'from_email': 'music@score.com',
+                        'from_name': 'MusicScore Creator',
                         'to': [{
                             'email': this.destinataire,
                             'type': 'to'
                         }],
                         'autotext': 'true',
-                        'subject': 'MusicScore Creator - Vous avez reçu une partition',
-                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title> <link rel="stylesheet" type="text/css" href="stylesheets/email.css"> <style>*{margin:0;padding:0;font-family:"Helvetica Neue",Helvetica,Helvetica,Arial,sans-serif}img{max-width:100%}.collapse{padding:0}body{width:100%!important;height:100%;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:none}a{color:#2BA6CB}table.body-wrap,table.head-wrap{width:100%;margin:0;padding:0}table.footer-wrap{clear:both!important;width:100%;border-top:1px solid #f7f7f7}h1,h2,h3,h4,h5,h6{margin-bottom:15px;font-family:HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;line-height:1.1;color:#000}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small{text-transform:none;font-size:60%;line-height:0;color:#6f6f6f}h1{font-size:44px;font-weight:200}h2{font-size:37px;font-weight:200}h3{font-size:27px;font-weight:500}h4{font-size:23px;font-weight:500}h5{font-size:17px;font-weight:900}h6{text-transform:uppercase;font-size:14px;font-weight:900}.collapse{margin:0!important;width:100%}p,ul{margin-bottom:10px;font-size:14px;font-weight:400;line-height:1.6}p.lead{font-size:17px}p.last{margin-bottom:0}ul li{margin-left:5px;list-style-position:inside}.container{display:block!important;clear:both!important;margin:0 auto!important;max-width:600px!important}.content{display:block;margin:0 auto;padding:15px;max-width:600px}.content table{width:100%}.column{float:left;width:300px}.column tr td{padding:15px}.column-wrap{margin:0 auto;padding:0!important;max-width:600px!important}.column table{width:100%}.social .column{float:left;width:280px;min-width:279px}.clear{display:block;clear:both}@media only screen and (max-width:600px){div[class=column]{float:none!important;width:auto!important}}</style></head><body bgcolor="#FFFFFF" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0"> <table class="head-wrap" bgcolor="#263238"> <tr> <td></td><td class="header container"> <div class="content"> <table bgcolor="#263238" width="100%" style="width: 100%"> <tr> <td align="center"> <h1 class="collapse" color="#fff" style="color: #fff; font-weight: 300;">MusicScore Creator</h1> </td></tr></table> </div></td><td></td></tr></table> <table class="body-wrap" bgcolor=""> <tr> <td></td><td class="container" align="" bgcolor="#FFFFFF"> <div class="content"> <table> <tr> <td> <h1>Félicitations !</h1> <p class="lead">' + this.username + ' vous a partagé une partition.</p><p><img src="http://placehold.it/600x300" alt=""></p><p><blockquote>' + this.description + '</blockquote></p><p>Retrouvez toutes vos partitions musicales sur MusicScore Creator.</p></td></tr></table> </div></td><td></td></tr></table> <table class="footer-wrap"> <tr> <td></td><td class="container"> <div class="content"> <table width="100%" style="width: 100%"> <tr> <td align="center" style="text-align: center;"> <p> <a href="#">Terms</a> | <a href="#">Privacy</a> | <a href="#"> <unsubscribe>Unsubscribe</unsubscribe> </a> </p></td></tr></table> </div></td><td></td></tr></table> </body></html>'
+                        'subject': 'MusicScore Creator - You received a music sheet',
+                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title><style>*{margin:0;padding:0;font-family:"Helvetica Neue",Helvetica,Helvetica,Arial,sans-serif}img{max-width:100%}.collapse{padding:0}body{width:100%!important;height:100%;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:none}a{color:#2BA6CB}table.body-wrap,table.head-wrap{width:100%;margin:0;padding:0}table.footer-wrap{clear:both!important;width:100%;border-top:1px solid #f7f7f7}h1,h2,h3,h4,h5,h6{margin-bottom:15px;font-family:HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;line-height:1.1;color:#000}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small{text-transform:none;font-size:60%;line-height:0;color:#6f6f6f}h1{font-size:44px;font-weight:200}h2{font-size:37px;font-weight:200}h3{font-size:27px;font-weight:500}h4{font-size:23px;font-weight:500}h5{font-size:17px;font-weight:900}h6{text-transform:uppercase;font-size:14px;font-weight:900}.collapse{margin:0!important;width:100%}p,ul{margin-bottom:10px;font-size:14px;font-weight:400;line-height:1.6}p.lead{font-size:17px}p.last{margin-bottom:0}ul li{margin-left:5px;list-style-position:inside}.container{display:block!important;clear:both!important;margin:0 auto!important;max-width:600px!important}.content{display:block;margin:0 auto;padding:15px;max-width:600px}.content table{width:100%}.column{float:left;width:300px}.column tr td{padding:15px}.column-wrap{margin:0 auto;padding:0!important;max-width:600px!important}.column table{width:100%}.social .column{float:left;width:280px;min-width:279px}.clear{display:block;clear:both}@media only screen and (max-width:600px){div[class=column]{float:none!important;width:auto!important}}</style></head><body bgcolor="#ffffff" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0"> <table class="head-wrap" bgcolor="#263238"> <tr> <td></td><td class="header container"> <div class="content"> <table bgcolor="#263238" width="100%" style="width: 100%"> <tr> <td align="center"> <h1 class="collapse" color="#fff" style="color: #fff; font-weight: 300;">MusicScore Creator</h1> </td></tr></table> </div></td><td></td></tr></table> <table class="body-wrap" bgcolor=""> <tr> <td></td><td class="container" align="" bgcolor="#ffffff"> <div class="content"> <table> <tr> <td> <h1>Congratulations!</h1> <p class="lead">' + this.username + ' shared a music sheet with you.</p> <h1>' + this.name + '</h1><p><img src="' + this.img + '" alt=""></p><p><blockquote>' + this.description + '</blockquote></p><p>Find all your musical sheets on <a href="https://github.com/francoischalifour/musicscore-creator">MusicScore Creator</a>.</p></td></tr></table> </div></td><td></td></tr></table> <table class="footer-wrap"> <tr> <td></td><td class="container"> <div class="content"> <table width="100%" style="width: 100%"> <tr> <td align="center" style="text-align: center;"> <p> <a href="#">Terms</a> | <a href="#">Privacy</a> | <a href="#"> <unsubscribe>Unsubscribe</unsubscribe> </a> </p></td></tr></table> </div></td><td></td></tr></table> </body></html>'
                     }
                 }
             }).done(function() {
-                console.log('Sheet music sent.');
-                this.shadowRoot.querySelector('#toast').show();
+                polymer.shadowRoot.querySelector('#toast').show();
+            }).fail(function() {
+                polymer.shadowRoot.querySelector('#toastError').show();
             });
         },
 
@@ -805,7 +833,4 @@
         }
     });
     </script>
-
-    <script src="../assets/js/download-sheet.js"></script>
-    <script src="../assets/js/share-sheet.js"></script>
 </polymer-element>
