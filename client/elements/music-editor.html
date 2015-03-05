@@ -85,12 +85,11 @@
             width: 40px;
             height: 40px;
             margin: 0 5px 5px 0;
-            border: 1px solid #f9f9f9;
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
+            border-radius: 2px;
             text-align: center;
             line-height: 40px;
             background: #fafafa;
+            transition: all ease-in .15s;
         }
         .capslock,
         .tab,
@@ -104,7 +103,8 @@
         #keyboard .capslock {
             width: 80px;
         }
-        #keyboard .return {
+        #keyboard .return,
+        #keyboard .erase {
             width: 77px;
         }
         #keyboard .left-shift {
@@ -131,12 +131,21 @@
         }
         #keyboard li:hover {
             position: relative;
-            background-color: #f7f7f7;
+            background-color: #f1f1f1;
             cursor: pointer;
         }
+        #keyboard li.active {
+            background-color: #78909c;
+            color: #fff;
+        }
+        /* #keyboard li.keydown {
+            background-color: #9e9e9e;
+            color: #fff;
+        } */
         #keyboard .category {
             width: 92px;
-            background-color: #eee;
+            background-color: #78909c;
+            color: #fff;
             pointer-events: none;
         }
         </style>
@@ -211,15 +220,15 @@
 
             <div class="card" flex>
                 <div horizontal justified layout>
-                    <div horizontal end-justified layout>
+                    <div horizontal start-justified layout>
                         <div class="card-header">Sheet</div>
                     </div>
                     <div horizontal end-justified layout>
-                        <paper-button on-click="{{downloadSheet}}">
+                        <paper-button on-tap="{{downloadSheet}}">
                             <core-icon icon="file-download"></core-icon>
                             Download
                         </paper-button>
-                        <paper-button on-click="{{shareSheet}}">
+                        <paper-button on-tap="{{shareSheet}}">
                             <core-icon icon="social:person-add"></core-icon>
                             Share
                         </paper-button>
@@ -257,7 +266,16 @@
 
         <div layout horizontal>
             <div class="card" flex>
-                <div class="card-header">{{name}}</div>
+                <div horizontal justified layout>
+                    <div horizontal start-justified layout>
+                        <div class="card-header">{{name}}</div>
+                    </div>
+
+                    <div horizontal end-justified layout on-click="{{translateLanguage}}">
+                        <paper-button>Fr</paper-button>
+                        <paper-button>En</paper-button>
+                    </div>
+                </div>
 
                 <p>
                     <content></content>
@@ -266,30 +284,24 @@
                 <p>
                     <ul id="keyboard" on-click="{{keyboardClick}}">
                         <li class="category">Notes</li>
-                        <li class="note">A </li>
-                        <li class="note">B </li>
-                        <li class="note">C </li>
-                        <li class="note">D </li>
-                        <li class="note">E </li>
-                        <li class="note">F </li>
-                        <li class="note lastitem">G </li>
-
-                        <li class="category">Alterations</li>
-                        <li class="alteration">## </li>
-                        <li class="alteration"># </li>
-                        <li class="alteration">n </li>
-                        <li class="alteration">b </li>
-                        <li class="alteration lastitem">bb </li>
+                        <li class="note">A</li>
+                        <li class="note">B</li>
+                        <li class="note">C</li>
+                        <li class="note">D</li>
+                        <li class="note">E</li>
+                        <li class="note">F</li>
+                        <li class="note">G</li>
+                        <li class="note lastitem">rest</li>
 
                         <li class="category">Durations</li>
-                        <li class="duration">:1 </li>
-                        <li class="duration">:2 </li>
-                        <li class="duration">:4 </li>
-                        <li class="duration">:8 </li>
-                        <li class="duration">:16 </li>
-                        <li class="duration">:32 </li>
-                        <li class="duration">:64 </li>
-                        <li class="duration lastitem">:128 </li>
+                        <li class="duration">ø</li>
+                        <li class="duration">𝅗𝅥</li>
+                        <li class="duration">♩</li>
+                        <li class="duration">♪</li>
+                        <li class="duration">𝅘𝅥𝅯</li>
+                        <li class="duration">𝅘𝅥𝅰</li>
+                        <li class="duration">𝅘𝅥𝅱</li>
+                        <li class="duration lastitem">𝅘𝅥𝅲</li>
 
                         <li class="category">Bars</li>
                         <li class="bar"> | </li>
@@ -299,27 +311,18 @@
                         <li class="bar"> =:: </li>
                         <li class="bar lastitem"> =|= </li>
 
-                        <li class="category">Numbers</li>
-                        <li class="number">1</li>
-                        <li class="number">2</li>
-                        <li class="number">3</li>
-                        <li class="number">4</li>
-                        <li class="number">5</li>
-                        <li class="number">6</li>
-                        <li class="number">7</li>
-                        <li class="number">8</li>
-                        <li class="number">9</li>
-                        <li class="number lastitem">0</li>
-
-                        <li class="category">Characters</li>
-                        <li class="spechar">/</li>
-                        <li class="spechar lastitem">-</li>
+                        <li class="category">Pitch</li>
+                        <li class="hauteur">/1 </li>
+                        <li class="hauteur">/2 </li>
+                        <li class="hauteur">/3 </li>
+                        <li class="hauteur active">/4 </li>
+                        <li class="hauteur">/5 </li>
+                        <li class="hauteur lastitem">/6 </li>
 
                         <li class="category">Options</li>
                         <li class="delete">delete</li>
-                        <li class="return lastitem">return</li>
-
-                        <li class="space lastitem">&nbsp;</li>
+                        <li class="return">return</li>
+                        <li class="erase lastitem">erase</li>
                     </ul>
                 </p>
             </div>
@@ -337,7 +340,7 @@
             </paper-input-decorator>
 
             <paper-button affirmative>Close</paper-button>
-            <paper-button class="primary" affirmative autofocus on-click="{{sendSheet}}">Share</paper-button>
+            <paper-button class="primary" affirmative autofocus on-tap="{{sendSheet}}">Share</paper-button>
         </paper-action-dialog>
 
         <paper-toast id="toast" text="Sheet music sent."></paper-toast>
@@ -348,6 +351,8 @@
     <script>
     Polymer('music-editor', {
         ready: function() {
+            'use strict';
+
             this.notation = true;
             this.tablature = false;
             this.time = '4/4';
@@ -355,10 +360,28 @@
             this.key = 'C';
             this.tuning = 'standard';
 
-            this.note = 'C ';
+            this.note = '';
             this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
 
-            this.write = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning + " \nnotes " + this.note;
+            this.langage = 'En';
+            this.notesLangage = {
+                'Fr': ['La', 'Si', 'Do', 'Ré', 'Mi', 'Fa', 'Sol'],
+                'En': ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+            }
+
+            this.inserted = [];
+            this.mesure = this.time.split('/');
+
+            this.durations = {
+                'ø': ':1',
+                '𝅗𝅥': ':2',
+                '♩': ':4',
+                '♪': ':8',
+                '𝅘𝅥𝅯': ':16',
+                '𝅘𝅥𝅰': ':32',
+                '𝅘𝅥𝅱': ':64',
+                '𝅘𝅥𝅲': ':128',
+            }
 
             this.clefs = [{
                 'name': 'Treble',
@@ -469,18 +492,80 @@
 
         observe: {
             'clef': 'updateData',
-            'time': 'updateData',
+            'time': 'updateTime',
             'key': 'updateData',
             'tuning': 'updateData',
             'note': 'updateData'
         },
 
         updateData: function(oldValue, newValue) {
-            $('.editor').val('tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning + "\nnotes " + this.note);
+            'use strict';
+
+            var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
+
+            if (this.note.trim().length == 0) {
+                console.log('pas de notes');
+            } else {
+                str += "\nnotes " + this.note;
+            }
+
+            $('.editor').val(str);
             $('.editor').trigger(jQuery.Event('keyup'));
         },
 
+        updateTime: function(oldValue, newValue) {
+            'use strict';
+
+            this.mesure = this.time.split('/');
+
+            console.log('Inserted : ' + this.inserted);
+
+            if (this.mesure.length == 2 && this.mesure[1].length > 0) {
+                var final_notes = "";
+                var mesure = [];
+
+                for (var i = 0; i < this.mesure.length; i++) {
+                    mesure[i] = parseInt(this.mesure[i]);
+                }
+
+                for (var i = 0; i < this.inserted.length; i++) {
+                    var el = this.inserted[i];
+                    if (el[0] == ':') {
+                        var temps = parseInt(this.mesure[0]) / parseInt(el.substr(1, el.length - 1));
+                        if (mesure[0] > temps) {
+                            mesure[0] -= temps;
+                            el += ' | ';
+                            i += 1;
+                        } else {
+                            temps -= mesure[0];
+                            if (mesure[1] > 0) {
+                                mesure[0] = parseInt(this.mesure[0]) - temps;
+                                mesure[1] -= 1;
+                                el += ' | ';
+                            } else {
+                                el += ' =|= ';
+                            }
+                        }
+                    }
+                    final_notes += el;
+                    console.log(final_notes);
+                    this.inserted = final_notes.split(' ');
+                };
+
+                this.note = final_notes;
+            }
+
+            console.log('Inserted : ' + this.inserted);
+
+            this.updateData(oldValue, newValue);
+        },
+
+        /**
+         * Opens the dialog box to share the music sheet.
+         */
         shareSheet: function() {
+            'use strict';
+
             var dialog = this.shadowRoot.querySelector('paper-action-dialog');
             if (!dialog)
                 return;
@@ -488,7 +573,12 @@
             dialog.toggle();
         },
 
+        /**
+         * Downloads the music sheet converted to PDF.
+         */
         downloadSheet: function() {
+            'use strict';
+
             this.canvas = document.querySelector('.vex-canvas');
             this.context = this.canvas.getContext('2d');
 
@@ -520,6 +610,8 @@
          * Sends the music sheet via email.
          */
         sendSheet: function() {
+            'use strict';
+
             // Abort if there is no recipient.
             if (!this.destinataire) {
                 this.shadowRoot.querySelector('#toastNoDest').show();
@@ -531,16 +623,12 @@
             if (!this.message)
                 this.message = '';
             else
-                this.message = this.message.replace('\n', '<br>');;
+                this.message = this.message;
 
             if (!this.description)
                 this.description = '';
             else
-                this.description = this.description.replace('\n', '<br>');
-
-            console.log(this.description);
-
-            return;
+                this.description = this.description;
 
             // Prepare the music sheet converted to image.
             this.canvas = document.querySelector('.vex-canvas');
@@ -685,22 +773,95 @@
             var $this = element.toElement;
             var character = $this.innerHTML;
 
-            // Delete
+            this.async(this.updateKeydown($this));
+
+            // Delete - erase
             if ($this.classList.contains('delete')) {
+                this.inserted = [];
                 this.note = '';
+                return;
+            } else if ($this.classList.contains('erase')) {
+                var str = this.note.trim();
+                if (this.inserted.length > 0) {
+                    var element = this.inserted.pop();
+                    this.note = str.substr(0, str.length - element.length);
+                }
                 return;
             }
 
-            // Special characters
-            if ($this.classList.contains('space')) character = ' ';
-            if ($this.classList.contains('tab')) character = "\t";
-            if ($this.classList.contains('return')) character = "\n";
-            if ($this.classList.contains('alteration') || $this.classList.contains('spechar')) {
-                this.note = '';
+            // Specific keyboard treatments
+            if ($this.classList.contains('return')) {
+                this.note += "\n";
+                character = "";
+                this.inserted.push('');
+            } else if ($this.classList.contains('hauteur')) {
+                character = "";
+                this.async(this.hauteurClick($this));
+            } else if ($this.classList.contains('duration')) {
+                this.async(this.durationClick($this));
+                character = this.durations[character] + ' ';
+            } else if ($this.classList.contains('note')) {
+                character = this.notesLangage['En'][this.notesLangage[this.langage].indexOf(character)];
+                character += $(this.shadowRoot.querySelector('.hauteur.active')).html();
             }
 
             // Add the character
-            this.note = this.note + character;
+            if (character.length > 0) {
+                this.inserted.push(character);
+            }
+            this.note += character;
+        },
+
+        /*
+         * TODO: refactor
+         */
+        updateKeydown: function(element) {
+            'use strict';
+
+            $(this.shadowRoot.querySelectorAll('.keydown')).each(function() {
+                $(this).removeClass('keydown');
+            });
+
+            element.classList.add('keydown');
+        },
+
+        durationClick: function(element) {
+            'use strict';
+
+            $(this.shadowRoot.querySelectorAll('.duration.active')).each(function() {
+                $(this).removeClass('active');
+            });
+
+            element.classList.add('active');
+        },
+
+        hauteurClick: function(element) {
+            'use strict';
+
+            $(this.shadowRoot.querySelectorAll('.hauteur.active')).each(function() {
+                $(this).removeClass('active');
+            });
+
+            element.classList.add('active');
+        },
+
+        translateLanguage: function(element) {
+            'use strict';
+
+            this.langage = element.toElement.innerHTML;
+
+            if (this.langage.length > 2) return; // To avoid the click between buttons.
+
+            if (this.langage.toUpperCase() != 'FR')
+                this.langage == 'En';
+            else
+                this.langage == 'Fr';
+
+            var polymer = this;
+
+            $(this.shadowRoot.querySelectorAll('.note')).each(function(index) {
+                $(this).html(polymer.notesLangage[polymer.langage][index]);
+            });
         }
     });
     </script>
