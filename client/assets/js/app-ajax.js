@@ -108,7 +108,7 @@
 
         var html = content.innerHTML;
 
-        // Import dynamically vextab-div script on documentation page.
+        // Import dynamically vextab-div script on documentation and creation page.
         if (this.route === 'doc' || this.route === 'create') {
             var body = document.getElementsByTagName('body').item(0);
             var vextab = document.createElement("script");

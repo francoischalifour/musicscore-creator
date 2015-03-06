@@ -151,6 +151,53 @@
         </style>
 
         <div horizontal layout wrap>
+
+            <div class="card" flex>
+
+                <div horizontal justified layout>
+                    <div horizontal start-justified layout>
+                        <div class="card-header">Sheet</div>
+                    </div>
+                    <div horizontal end-justified layout>
+                        <paper-button on-tap="{{downloadSheet}}">
+                            <core-icon icon="file-download"></core-icon>
+                            Download
+                        </paper-button>
+                        <paper-button on-tap="{{shareSheet}}">
+                            <core-icon icon="social:person-add"></core-icon>
+                            Share
+                        </paper-button>
+                    </div>
+                </div>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Name</h4>
+                    </div>
+                    <div horizontal layout flex four>
+                        <div horizontal layout flex>
+                            <paper-input value="{{name}}" label="Name" flex></paper-input>
+                        </div>
+                    </div>
+                </core-label>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Description</h4>
+                    </div>
+                    <div horizontal layout flex four>
+                        <div horizontal layout flex>
+                            <paper-input-decorator label="Description" flex>
+                                <paper-autogrow-textarea>
+                                    <textarea is="core-input" value="{{description}}"></textarea>
+                                </paper-autogrow-textarea>
+                            </paper-input-decorator>
+                        </div>
+                    </div>
+                </core-label>
+
+            </div>
+
             <div class="card" flex>
 
                 <div class="card-header">
@@ -216,51 +263,6 @@
                         </paper-dropdown-menu>
                     </div>
                 </core-label>
-            </div>
-
-            <div class="card" flex>
-                <div horizontal justified layout>
-                    <div horizontal start-justified layout>
-                        <div class="card-header">Sheet</div>
-                    </div>
-                    <div horizontal end-justified layout>
-                        <paper-button on-tap="{{downloadSheet}}">
-                            <core-icon icon="file-download"></core-icon>
-                            Download
-                        </paper-button>
-                        <paper-button on-tap="{{shareSheet}}">
-                            <core-icon icon="social:person-add"></core-icon>
-                            Share
-                        </paper-button>
-                    </div>
-                </div>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Name</h4>
-                    </div>
-                    <div horizontal layout flex four>
-                        <div horizontal layout flex>
-                            <paper-input value="{{name}}" label="Name" flex></paper-input>
-                        </div>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Description</h4>
-                    </div>
-                    <div horizontal layout flex four>
-                        <div horizontal layout flex>
-                            <paper-input-decorator label="Description" flex>
-                                <paper-autogrow-textarea>
-                                    <textarea is="core-input" value="{{description}}"></textarea>
-                                </paper-autogrow-textarea>
-                            </paper-input-decorator>
-                        </div>
-                    </div>
-                </core-label>
-
             </div>
         </div>
 
@@ -363,7 +365,7 @@
             this.note = '';
             this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
 
-            this.langage = 'En';
+            this.language = 'En';
             this.notesLangage = {
                 'Fr': ['La', 'Si', 'Do', 'Ré', 'Mi', 'Fa', 'Sol'],
                 'En': ['A', 'B', 'C', 'D', 'E', 'F', 'G']
@@ -498,6 +500,11 @@
             'note': 'updateData'
         },
 
+        /**
+         * Updates music score.
+         * @param  {string} oldValue The string that defines the music score before getting updated
+         * @param  {string} newValue The string updated
+         */
         updateData: function(oldValue, newValue) {
             'use strict';
 
@@ -513,6 +520,11 @@
             $('.editor').trigger(jQuery.Event('keyup'));
         },
 
+        /**
+         * Updates and corrects bars to match the time signature.
+         * @param  {string} oldValue The string that defines the music score before getting updated
+         * @param  {string} newValue The string updated
+         */
         updateTime: function(oldValue, newValue) {
             'use strict';
 
@@ -547,10 +559,11 @@
                             }
                         }
                     }
+
                     final_notes += el;
                     console.log(final_notes);
                     this.inserted = final_notes.split(' ');
-                };
+                }
 
                 this.note = final_notes;
             }
@@ -665,44 +678,6 @@
         },
 
         /**
-         * Tranposes a note higher on the panel settings.
-         */
-        transHigherUI: function() {
-            'use strict';
-
-            var note = this.note.toLowerCase();
-
-            var index = $.inArray(note, this.notes);
-            var next = this.notes[($.inArray(note, this.notes) + 1) % this.notes.length];
-
-            if (index !== -1) {
-                note = next.toUpperCase();
-                this.note = note;
-            } else {
-                console.log('Note introuvable');
-            }
-        },
-
-        /**
-         * Transposes a note lower on the panel settings.
-         */
-        transLowerUI: function() {
-            'use strict';
-
-            var note = this.note.toLowerCase();
-
-            var index = $.inArray(note, this.notes);
-            var prev = this.notes[($.inArray(note, this.notes) - 1) % this.notes.length];
-
-            if (index !== -1) {
-                note = prev.toUpperCase();
-                this.note = note;
-            } else {
-                console.log('Note introuvable');
-            }
-        },
-
-        /**
          * Transposes a note higher.
          * @param  {string} note The note to transpose
          * @return {string} the note higher
@@ -767,6 +742,10 @@
             console.log(sheet2);
         });*/
 
+        /**
+         * Adds the character in the textarea.
+         * @param  {object} element The character clicked
+         */
         keyboardClick: function(element) {
             'use strict';
 
@@ -801,7 +780,7 @@
                 this.async(this.durationClick($this));
                 character = this.durations[character] + ' ';
             } else if ($this.classList.contains('note')) {
-                character = this.notesLangage['En'][this.notesLangage[this.langage].indexOf(character)];
+                character = this.notesLangage['En'][this.notesLangage[this.language].indexOf(character)];
                 character += $(this.shadowRoot.querySelector('.hauteur.active')).html();
             }
 
@@ -848,19 +827,19 @@
         translateLanguage: function(element) {
             'use strict';
 
-            this.langage = element.toElement.innerHTML;
+            this.language = element.toElement.innerHTML;
 
-            if (this.langage.length > 2) return; // To avoid the click between buttons.
+            if (this.language.length > 2) return; // To avoid the click between buttons.
 
-            if (this.langage.toUpperCase() != 'FR')
-                this.langage == 'En';
+            if (this.language.toUpperCase() != 'FR')
+                this.language == 'En';
             else
-                this.langage == 'Fr';
+                this.language == 'Fr';
 
             var polymer = this;
 
             $(this.shadowRoot.querySelectorAll('.note')).each(function(index) {
-                $(this).html(polymer.notesLangage[polymer.langage][index]);
+                $(this).html(polymer.notesLangage[polymer.language][index]);
             });
         }
     });
