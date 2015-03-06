@@ -303,7 +303,7 @@
                 </p>
 
                 <p>
-                    <ul id="keyboard" on-click="{{keyboardClick}}">
+                    <ul id="keyboard" on-tap="{{keyboardClick}}">
                         <li class="category">Notes</li>
                         <li class="note">A</li>
                         <li class="note">B</li>
@@ -526,6 +526,13 @@
                 'name': 'E/3',
                 'value': 'E/3'
             }];
+
+            // Initialize value of the music sheet right after Vextab is loaded.
+            var sheet = this;
+            setTimeout(function() {
+                $('.editor').val('tabstave notation=' + sheet.notation + ' tablature=' + sheet.tablature + ' time=' + sheet.time + ' clef=' + sheet.clef + ' key=' + sheet.key + ' tuning=' + sheet.tuning);
+                $('.editor').trigger(jQuery.Event('keyup'));
+            }, 1000);
         },
 
         observe: {
@@ -546,9 +553,7 @@
 
             var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
 
-            if (this.note.trim().length == 0) {
-                console.log('pas de notes');
-            } else {
+            if (this.note.trim().length !== 0) {
                 str += "\nnotes " + this.note;
             }
 
@@ -568,7 +573,7 @@
 
             console.log('Inserted : ' + this.inserted);
 
-            if (this.mesure.length == 2 && this.mesure[1].length > 0) {
+            if (this.mesure.length === 2 && this.mesure[1].length > 0) {
                 var final_notes = '';
                 var mesure = [];
 
@@ -578,7 +583,7 @@
 
                 for (var i = 0; i < this.inserted.length; i++) {
                     var el = this.inserted[i];
-                    if (el[0] == ':') {
+                    if (el[0] === ':') {
                         var temps = parseInt(this.mesure[0]) / parseInt(el.substr(1, el.length - 1));
                         if (mesure[0] > temps) {
                             mesure[0] -= temps;
@@ -667,30 +672,53 @@
                 return;
             }
 
-            this.username = 'A user';
+            var username = 'A user';
+            var name = this.name || 'Music sheet';
 
             if (!this.message)
-                this.message = '';
+                var message = '';
             else
-                this.message = this.message;
+                var message = '<div style="min-height:16px"></div><div style="min-height:1px;background-color:#eee"></div><div style="min-height:24px"></div><div style="display:table-row"><img style="display:table-cell" width="50" src="https://ci6.googleusercontent.com/proxy/s-yPWoeSrlt6ZaoEP0RnkHoJeHLVeSoqJqjDYitG58eUv3D1-OW-h7BVqADdvJRBzR92d16tqhuflDKOtJsB3Zn_ZHZKoZOqYZC_Q1gOYVOp=s0-d-e1-ft#https://ssl.gstatic.com/s2/profiles/images/silhouette64.png" alt=""><span style="display:table-cell;vertical-align:top;padding-left:16px;font-size:13px;line-height:18px;max-width:496px;color:#262626">' + this.message.replace(/\n/g, "<br>")  + '</span></div>';
 
             if (!this.description)
-                this.description = '';
+                var description = '';
             else
-                this.description = this.description;
+                var description = '<div style="min-height:16px"></div><div style="font-size:14px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell;">' + this.description.replace(/\n/g, "<br>")+ '<div></div></span></div></div>';
 
-            // Prepare the music sheet converted to image.
+            // Prepare the music sheet converted to PDF.
             this.canvas = document.querySelector('.vex-canvas');
             this.context = this.canvas.getContext('2d');
-            this.img = this.canvas.toDataURL('image/jpeg', 1.0);
 
-            // To attach the PDF (TODO).
-            // this.pdfBase64 = this.pdf.output('datauristring');
+            // Fill the background with white.
+            this.context.globalCompositeOperation = 'destination-over';
+            this.context.fillStyle = '#fff';
+            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Convert to image and give a filename.
+            this.img = this.canvas.toDataURL('image/jpeg', 1.0);
+            this.filename = this.name || 'musicscore';
+
+            // Create the PDF.
+            this.pdf = jsPDF();
+
+            // Create music sheet information.
+            this.pdf.setFontSize(22);
+            this.pdf.text(25, 25, this.name);
+            this.pdf.setFontSize(12);
+            this.pdf.setTextColor(150);
+            this.pdf.text(25, 32, 'Written with MusicScore Creator');
+
+            // Add the information to the PDF.
+            this.pdf.addImage(this.img, 'JPEG', 24, 40);
+
+            // To attach the PDF.
+            this.pdfBase64 = this.pdf.output('datauristring').split(',')[1];
 
             // Stock the pointer to use in the Ajax element.
             var polymer = this;
 
             $.ajax({
+                type: 'POST',
                 url: 'https://mandrillapp.com/api/1.0/messages/send.json',
                 data: {
                     'key': 'VzH_MdGdZGIpXEbE_LdjHA',
@@ -701,9 +729,14 @@
                             'email': this.destinataire,
                             'type': 'to'
                         }],
+                        'attachments': [{
+                            'type': 'application/pdf;base64',
+                            'name': this.filename + '.pdf',
+                            'content': this.pdfBase64
+                        }],
                         'autotext': 'true',
                         'subject': 'MusicScore Creator - You received a music sheet',
-                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title><style>*{margin:0;padding:0;font-family:"Helvetica Neue",Helvetica,Helvetica,Arial,sans-serif}img{max-width:100%}.collapse{padding:0}body{width:100%!important;height:100%;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:none}a{color:#2BA6CB}table.body-wrap,table.head-wrap{width:100%;margin:0;padding:0}table.footer-wrap{clear:both!important;width:100%;border-top:1px solid #f7f7f7}h1,h2,h3,h4,h5,h6{margin-bottom:15px;font-family:HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;line-height:1.1;color:#000}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small{text-transform:none;font-size:60%;line-height:0;color:#6f6f6f}h1{font-size:44px;font-weight:200}h2{font-size:37px;font-weight:200}h3{font-size:27px;font-weight:500}h4{font-size:23px;font-weight:500}h5{font-size:17px;font-weight:900}h6{text-transform:uppercase;font-size:14px;font-weight:900}.collapse{margin:0!important;width:100%}p,ul{margin-bottom:10px;font-size:14px;font-weight:400;line-height:1.6}p.lead{font-size:17px}p.last{margin-bottom:0}ul li{margin-left:5px;list-style-position:inside}.container{display:block!important;clear:both!important;margin:0 auto!important;max-width:600px!important}.content{display:block;margin:0 auto;padding:15px;max-width:600px}.content table{width:100%}.column{float:left;width:300px}.column tr td{padding:15px}.column-wrap{margin:0 auto;padding:0!important;max-width:600px!important}.column table{width:100%}.social .column{float:left;width:280px;min-width:279px}.clear{display:block;clear:both}@media only screen and (max-width:600px){div[class=column]{float:none!important;width:auto!important}}</style></head><body bgcolor="#ffffff" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0"> <table class="head-wrap" bgcolor="#263238"> <tr> <td></td><td class="header container"> <div class="content"> <table bgcolor="#263238" width="100%" style="width: 100%"> <tr> <td align="center"> <h1 class="collapse" color="#fff" style="color: #fff; font-weight: 300;">MusicScore Creator</h1> </td></tr></table> </div></td><td></td></tr></table> <table class="body-wrap" bgcolor=""> <tr> <td></td><td class="container" align="" bgcolor="#ffffff"> <div class="content"> <table> <tr> <td> <h1>Congratulations!</h1> <p class="lead">' + this.username + ' shared a music sheet with you.</p> <h1>' + this.name + '</h1><p>' + this.description + '</p><p><img src="' + this.img + '" alt=""></p><p><blockquote>' + this.message + '</blockquote></p><p>Find all your musical sheets on <a href="https://github.com/francoischalifour/musicscore-creator">MusicScore Creator</a>.</p></td></tr></table> </div></td><td></td></tr></table> <table class="footer-wrap"> <tr> <td></td><td class="container"> <div class="content"> <table width="100%" style="width: 100%"> <tr> <td align="center" style="text-align: center;"> <p> <a href="#">Terms</a> | <a href="#">Privacy</a> | <a href="#"> <unsubscribe>Unsubscribe</unsubscribe> </a> </p></td></tr></table> </div></td><td></td></tr></table> </body></html>'
+                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title><div><div style="width:100%;padding:24px 0 16px 0;background-color:#f5f5f5;text-align:center"><div style="display:inline-block;width:90%;max-width:680px;min-width:280px;text-align:left;font-family:Roboto,Arial,Helvetica,sans-serif"><div style="display:block;padding:0 2px"><div style="display:block;background:#fff;min-height:2px"></div></div><div style="border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0"><div style="padding:24px 32px 32px 32px;background:#fff;border-right:1px solid #eaeaea;border-left:1px solid #eaeaea" dir="ltr"><div style="font-size:14px;line-height:18px;color:#444"><a href="mailto:michel@lesecuriesdeventadour.com" style="color:inherit;text-decoration:none" target="_blank">' + username + '</a> <b>shared</b> a music sheet with you.</div><div style="min-height:24px"></div><div style="font-size:18px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle" target="_blank">' + name + '</a><div></div></span></div></div>' + description + message + '<div style="min-height:32px"></div><div><a href="https://github.com/francoischalifour/musicscore-creator" style="background-color:#263238;border:1px solid #263238;border-radius:2px;color:#fff;display:inline-block;font-family:Arial;font-size:11px;font-weight:700;min-height:29px;line-height:29px;min-width:54px;outline:0;padding:0 8px;text-align:center;text-decoration:none" target="_blank">Go to MusicScore Creator</a></div></div></div><table style="width:100%;border-collapse:collapse"><tr><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#e5e5e5" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><tr height="1"><td width="1" bgcolor="#f5f5f5" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"></table><td style="width:100%;padding:0"><div style="min-height:1px;width:auto;border-top:1px solid #ddd;background:#eaeaea;border-bottom:1px solid #f0f0f0"></div><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#e5e5e5" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f5f5f5" style="padding:0"></table></table><table style="padding:14px 10px 0 10px" dir="ltr"><tr><td style="width:100%;font-size:11px;font-family:Open Sans,Arial;color:#646464;line-height:20px;min-height:40px;vertical-align:middle">Find all your musical sheets on <a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle">MusicScore Creator</a>.<td style="padding-left:20px;vertical-align:middle"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#888;text-decoration:none;vertical-align:middle" target="_blank">MusicScore Creator</a></table></div></div></div></body></html>'
                     }
                 }
             }).done(function() {
@@ -827,8 +860,8 @@
         keyboardClick: function(element) {
             'use strict';
 
-            var $this = element.toElement;
-            var character = $this.innerHTML;
+            var $this = element.target;
+            var character = $this.innerText;
 
             this.async(this.updateKeydown($this));
 
@@ -848,12 +881,12 @@
 
             // Specific keyboard treatments
             if ($this.classList.contains('return')) {
-                this.note += "\n";
-                character = "";
+                this.note += '\n';
+                character = '';
                 this.inserted.push('');
             } else if ($this.classList.contains('hauteur')) {
-                character = "";
-                this.async(this.hauteurClick($this));
+                character = '';
+                this.async(this.pitchClick($this));
             } else if ($this.classList.contains('duration')) {
                 this.async(this.durationClick($this));
                 character = this.durations[character] + ' ';
@@ -892,7 +925,7 @@
             element.classList.add('active');
         },
 
-        hauteurClick: function(element) {
+        pitchClick: function(element) {
             'use strict';
 
             $(this.shadowRoot.querySelectorAll('.hauteur.active')).each(function() {
@@ -902,6 +935,10 @@
             element.classList.add('active');
         },
 
+        /**
+         * Translates the keyboard.
+         * @param  {object} element
+         */
         translateLanguage: function(element) {
             'use strict';
 
@@ -909,10 +946,10 @@
 
             if (this.language.length > 2) return; // To avoid the click between buttons.
 
-            if (this.language.toUpperCase() != 'FR')
-                this.language == 'En';
+            if (this.language.toUpperCase() !== 'FR')
+                this.language === 'En';
             else
-                this.language == 'Fr';
+                this.language === 'Fr';
 
             var polymer = this;
 
