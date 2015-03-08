@@ -282,6 +282,16 @@
                         </paper-dropdown-menu>
                     </div>
                 </core-label>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Transpose</h4>
+                    </div>
+                    <div horizontal layout flex three>
+                        <paper-button on-tap="{{transpose}}">-</paper-button>
+                        <paper-button on-tap="{{transpose}}">+</paper-button>
+                    </div>
+                </core-label>
             </div>
         </div>
 
@@ -801,8 +811,8 @@
 
             var note = note.toLowerCase();
 
-            var index = $.inArray(note, notes);
-            var next = notes[($.inArray(note, notes) + 1) % notes.length];
+            var index = $.inArray(note, this.notes);
+            var next = this.notes[($.inArray(note, this.notes) + 1) % this.notes.length];
 
             if (index !== -1) {
                 return next.toUpperCase();
@@ -821,8 +831,8 @@
 
             var note = note.toLowerCase();
 
-            var index = $.inArray(note, notes);
-            var prev = notes[($.inArray(note, notes) - 1 + notes.length) % notes.length];
+            var index = $.inArray(note, this.notes);
+            var prev = this.notes[($.inArray(note, this.notes) - 1 + this.notes.length) % this.notes.length];
 
             if (index !== -1) {
                 return prev.toUpperCase();
@@ -833,28 +843,26 @@
 
         /**
          * Replaces all notes to transpose.
+         * @param {string} type Higher or Lower
          */
-        /*$(function() {
+        transpose: function() {
             'use strict';
 
-            var sheet1 = $('#sheetTrans').val().split('notes');
-            console.log(sheet1[1]);
+            var sheet1 = $('.editor').val().split('notes');
             var sheet = sheet1[1].split('');
-            var sheet2 = $('#sheetTrans').val();
-            console.log(sheet);
 
-            console.log(sheet.length);
-            console.log(notes.length);
+            var polymer = this;
 
             sheet.forEach(function(note) {
                 if (note.match(/[a-g]#?b?/i)) {
-                    console.log(transHigher(note));
-                    sheet2.replace(note, transHigher(note));
+                    var reg = new RegExp(note, "g");
+                    $('.editor').val($('.editor').val().replace(reg, polymer.transHigher(note)));
                 }
             });
 
-            console.log(sheet2);
-        });*/
+            // Refresh the canvas.
+            $('.editor').trigger(jQuery.Event('keyup'));
+        },
 
         /**
          * Adds the character in the textarea.
