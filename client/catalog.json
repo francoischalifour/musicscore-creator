@@ -1,0 +1,16 @@
+[{
+    "id": "1",
+    "name": "Ma première partition",
+    "description": "Ceci est la première partition de Beethoven",
+    "content": "tabstave notation=true tablature=true\nnotes 5/6 8/6 5/5 8/5 | 5/4 7/4 5/3 7/3 | 5/2 8/2 5/1 8/1 =:|"
+}, {
+    "id": "2",
+    "name": "Ma seconde partition",
+    "description": "Ceci est la première partition de Schuman",
+    "content": "tabstave notation=true tablature=false\nnotes Cn-D-E/4 F#/5"
+}, {
+    "id": "3",
+    "name": "Ma troisième partition",
+    "description": "Ceci est la première partition de monsieur Michel PARIS",
+    "content": "tabstave notation=true tablature=false time=4/4 key=C tuning=eb\nnotes :8 C-D-E-F-G-A-B/4 C/5\ntext :8,.1,Do,Ré,Mi,.10,Fa,Sol,La,Si,.1,Do\noptions space=18"
+}]
