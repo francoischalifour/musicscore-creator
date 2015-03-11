@@ -7,7 +7,7 @@
 
     <script>
     (function() {
-        var catalog = $('#catalog');
+        var catalogBox = $('#catalog');
 
         /**
          * Gets all sheets from the catalog.
@@ -16,14 +16,18 @@
          */
         $.getJSON('catalog.json', function(data) {
             var items = [];
-            $.each(data, function(key, val) {
-                items.push('<div class="card">' + val + '</div>');
+
+            $.each(data, function(key, sheet) {
+                /*sheet.contributors.forEach(function(contributor) {
+                    console.log(contributor.id);
+                });*/
+
+                items.push('<div class="card"><div class="card-header">' + sheet.title + '</div><p>Par ' + sheet.author + '</p><p>' + sheet.description + '</p></div>');
             });
 
             $('<div>', {
-                'class': '',
                 html: items.join('')
-            }).appendTo(catalog);
+            }).appendTo(catalogBox);
         });
     })();
     </script>
