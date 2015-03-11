@@ -18,6 +18,7 @@
             </div>
 
             <paper-toast id="toast" text="Your username or password is incorrect."></paper-toast>
+            <paper-toast id="toastError" text="Server unreachable."></paper-toast>
         </form>
 
         <script>
@@ -40,7 +41,7 @@
                     dataType: 'json',
                     success: function(users) {
                         users.forEach(function(user) {
-                            if (user.username == username && user.password == password) {
+                            if (user.username === username && user.password  === password) {
                                 $('#login').html('Connecté en tant que ' + user.username);
                                 $('#login').append(' (' + user.credits + ' crédits)');
                                 $(location).attr('href', '#home');
@@ -49,7 +50,7 @@
                         });
                     },
                     error: function(err) {
-                        console.log('Problème de connexion au serveur');
+                        document.getElementById('toastError').show();
                     }
                 });
             });
