@@ -85,12 +85,11 @@
             width: 40px;
             height: 40px;
             margin: 0 5px 5px 0;
-            border: 1px solid #f9f9f9;
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
+            border-radius: 2px;
             text-align: center;
             line-height: 40px;
             background: #fafafa;
+            transition: all ease-in .15s;
         }
         .capslock,
         .tab,
@@ -104,7 +103,8 @@
         #keyboard .capslock {
             width: 80px;
         }
-        #keyboard .return {
+        #keyboard .return,
+        #keyboard .erase {
             width: 77px;
         }
         #keyboard .left-shift {
@@ -131,17 +131,92 @@
         }
         #keyboard li:hover {
             position: relative;
-            background-color: #f7f7f7;
+            background-color: #f1f1f1;
             cursor: pointer;
         }
+        #keyboard li.active {
+            background-color: #78909c;
+            color: #fff;
+        }
+        /* #keyboard li.keydown {
+            background-color: #9e9e9e;
+            color: #fff;
+        } */
+
         #keyboard .category {
             width: 92px;
-            background-color: #eee;
+            background-color: #78909c;
+            color: #fff;
             pointer-events: none;
         }
         </style>
 
         <div horizontal layout wrap>
+
+            <div class="card" flex>
+
+                <div horizontal justified layout>
+                    <div horizontal start-justified layout>
+                        <div class="card-header">Sheet</div>
+                    </div>
+
+                    <div horizontal end-justified layout>
+                        <paper-button on-tap="{{downloadSheet}}">
+                            <core-icon icon="file-download"></core-icon>
+                            Download
+                        </paper-button>
+                        <paper-button on-tap="{{openShareDialog}}">
+                            <core-icon icon="social:person-add"></core-icon>
+                            Share
+                        </paper-button>
+
+                        <paper-menu-button>
+                            <paper-button>
+                                <core-icon icon="more-vert"></core-icon>
+                                More
+                            </paper-button>
+                            <paper-dropdown halign="right" class="dropdown">
+                                <core-menu>
+                                    <paper-item on-tap="{{openImportDialog}}">
+                                        Import
+                                    </paper-item>
+                                    <paper-item on-tap="{{openExportDialog}}">
+                                        Export
+                                    </paper-item>
+                                </core-menu>
+                            </paper-dropdown>
+                        </paper-menu-button>
+                    </div>
+                </div>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Title</h4>
+                    </div>
+                    <div horizontal layout flex four>
+                        <div horizontal layout flex>
+                            <paper-input value="{{songtitle}}" label="Title" flex></paper-input>
+                        </div>
+                    </div>
+                </core-label>
+
+                <core-label horizontal layout flex>
+                    <div horizontal layout flex>
+                        <h4>Description</h4>
+                    </div>
+                    <div horizontal layout flex four>
+                        <div horizontal layout flex>
+                            <paper-input-decorator label="Description" flex>
+                                <paper-autogrow-textarea>
+                                    <textarea is="core-input" value="{{description}}"></textarea>
+                                </paper-autogrow-textarea>
+                            </paper-input-decorator>
+                        </div>
+                    </div>
+                </core-label>
+
+            </div>
+
             <div class="card" flex>
 
                 <div class="card-header">
@@ -150,20 +225,9 @@
 
                 <core-label horizontal layout flex>
                     <div horizontal layout flex>
-                        <h4>Name</h4>
-                    </div>
-                    <div horizontal layout flex>
-                        <div horizontal layout flex>
-                            <paper-input value="{{name}}" label="Name" flex></paper-input>
-                        </div>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
                         <h4>Clef</h4>
                     </div>
-                    <div horizontal layout flex>
+                    <div horizontal layout flex three>
                         <paper-dropdown-menu flex>
                             <paper-dropdown class="dropdown">
                                 <core-menu selected="{{clef}}" valueattr="value" class="menu">
@@ -180,7 +244,7 @@
                     <div horizontal layout flex>
                         <h4>Key</h4>
                     </div>
-                    <div horizontal layout flex>
+                    <div horizontal layout flex three>
                         <paper-dropdown-menu flex>
                             <paper-dropdown class="dropdown">
                                 <core-menu selected="{{key}}" valueattr="value" class="menu">
@@ -197,7 +261,7 @@
                     <div horizontal layout flex>
                         <h4>Time signature</h4>
                     </div>
-                    <div horizontal layout flex>
+                    <div horizontal layout flex three>
                         <paper-input value="{{time}}" label="C, C|, #/#" value="4/4" flex></paper-input>
                     </div>
                 </core-label>
@@ -206,7 +270,7 @@
                     <div horizontal layout flex>
                         <h4>Tuning</h4>
                     </div>
-                    <div horizontal layout flex>
+                    <div horizontal layout flex three>
                         <paper-dropdown-menu flex>
                             <paper-dropdown class="dropdown">
                                 <core-menu selected="{{tuning}}" valueattr="value" class="menu">
@@ -221,24 +285,22 @@
 
                 <core-label horizontal layout flex>
                     <div horizontal layout flex>
-                        <h4>Note</h4>
+                        <h4>Transpose</h4>
                     </div>
-                    <div horizontal layout flex>
-                        <div horizontal layout flex>
-                            <paper-input value="{{note}}" label="Note" flex id="note"></paper-input>
-                            <paper-button on-click="{{transHigherUI}}">+</paper-button>
-                            <paper-button on-click="{{transLowerUI}}">-</paper-button>
-                        </div>
+                    <div horizontal layout flex three>
+                        <paper-button on-tap="{{transpose}}">-</paper-button>
+                        <paper-button on-tap="{{transpose}}">+</paper-button>
                     </div>
                 </core-label>
             </div>
+        </div>
 
-            <div class="card" flex two>
+        <div layout horizontal>
+            <div class="card" flex>
                 <div horizontal justified layout>
                     <div horizontal start-justified layout>
-                        <div class="card-header">{{name}}</div>
+                        <div class="card-header">{{songtitle}}</div>
                     </div>
-
                     <div horizontal end-justified layout>
                         <paper-button on-click="{{downloadSheet}}">
                             <core-icon icon="file-download"></core-icon>
@@ -253,43 +315,37 @@
                             Listen
                         </paper-button>
                     </div>
+                    <div horizontal end-justified layout on-click="{{translateLanguage}}">
+                        <paper-button>Fr</paper-button>
+                        <paper-button>En</paper-button>
+                    </div>
                 </div>
 
-                <content></content>
-            </div>
-        </div>
-
-        <div layout horizontal>
-            <div class="card" flex>
-                <div class="card-header">Keyboard</div>
+                <p>
+                    <content></content>
+                </p>
 
                 <p>
-                    <ul id="keyboard" on-click="{{keyboardClick}}">
+                    <ul id="keyboard" on-tap="{{keyboardClick}}">
                         <li class="category">Notes</li>
-                        <li class="note">A </li>
-                        <li class="note">B </li>
-                        <li class="note">C </li>
-                        <li class="note">D </li>
-                        <li class="note">E </li>
-                        <li class="note">F </li>
-                        <li class="note lastitem">G </li>
-
-                        <li class="category">Alterations</li>
-                        <li class="alteration">## </li>
-                        <li class="alteration"># </li>
-                        <li class="alteration">n </li>
-                        <li class="alteration">b </li>
-                        <li class="alteration lastitem">bb </li>
+                        <li class="note">A</li>
+                        <li class="note">B</li>
+                        <li class="note">C</li>
+                        <li class="note">D</li>
+                        <li class="note">E</li>
+                        <li class="note">F</li>
+                        <li class="note">G</li>
+                        <li class="note lastitem">rest</li>
 
                         <li class="category">Durations</li>
-                        <li class="duration">:1 </li>
-                        <li class="duration">:2 </li>
-                        <li class="duration">:4 </li>
-                        <li class="duration">:8 </li>
-                        <li class="duration">:16 </li>
-                        <li class="duration">:32 </li>
-                        <li class="duration">:64 </li>
-                        <li class="duration lastitem">:128 </li>
+                        <li class="duration">ø</li>
+                        <li class="duration">𝅗𝅥</li>
+                        <li class="duration">♩</li>
+                        <li class="duration">♪</li>
+                        <li class="duration">𝅘𝅥𝅯</li>
+                        <li class="duration">𝅘𝅥𝅰</li>
+                        <li class="duration">𝅘𝅥𝅱</li>
+                        <li class="duration lastitem">𝅘𝅥𝅲</li>
 
                         <li class="category">Bars</li>
                         <li class="bar"> | </li>
@@ -299,53 +355,66 @@
                         <li class="bar"> =:: </li>
                         <li class="bar lastitem"> =|= </li>
 
-                        <li class="category">Numbers</li>
-                        <li class="number">1</li>
-                        <li class="number">2</li>
-                        <li class="number">3</li>
-                        <li class="number">4</li>
-                        <li class="number">5</li>
-                        <li class="number">6</li>
-                        <li class="number">7</li>
-                        <li class="number">8</li>
-                        <li class="number">9</li>
-                        <li class="number lastitem">0</li>
-
-                        <li class="category">Characters</li>
-                        <li class="spechar">/</li>
-                        <li class="spechar lastitem">-</li>
+                        <li class="category">Pitch</li>
+                        <li class="hauteur">/1 </li>
+                        <li class="hauteur">/2 </li>
+                        <li class="hauteur">/3 </li>
+                        <li class="hauteur active">/4 </li>
+                        <li class="hauteur">/5 </li>
+                        <li class="hauteur lastitem">/6 </li>
 
                         <li class="category">Options</li>
                         <li class="delete">delete</li>
-                        <li class="return lastitem">return</li>
-
-                        <li class="space lastitem">&nbsp;</li>
+                        <li class="return">return</li>
+                        <li class="erase lastitem">erase</li>
                     </ul>
                 </p>
             </div>
         </div>
 
-        <paper-action-dialog backdrop layered="false" transition="core-transition-center" heading="Share with others">
+        <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="sendPanel" heading="Share with others">
             <paper-input-decorator floatingLabel label="Enter email address...">
-                <input is="core-input" type="mail" name="destinataire" value="{{destinataire}}" required>
+                <input is="core-input" type="mail" value="{{destinataire}}" required>
             </paper-input-decorator>
 
             <paper-input-decorator floatingLabel label="Incude a personal message...">
-                <textarea is="core-input" name="description" value="{{description}}"></textarea>
+                <paper-autogrow-textarea>
+                    <textarea is="core-input" value="{{message}}"></textarea>
+                </paper-autogrow-textarea>
             </paper-input-decorator>
 
             <paper-button affirmative>Close</paper-button>
-            <paper-button class="primary" affirmative autofocus on-click="{{sendSheet}}">Share</paper-button>
+            <paper-button class="primary" affirmative autofocus on-tap="{{sendSheet}}">Share</paper-button>
         </paper-action-dialog>
 
+        <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="exportPanel" heading="Export">
+            <pre><code>{{exportCode}}</code></pre>
+
+            <paper-button affirmative>Close</paper-button>
+        </paper-action-dialog>
+
+        <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="importPanel" heading="Import">
+            <paper-input-decorator floatingLabel label="Code">
+                <paper-autogrow-textarea>
+                    <textarea is="core-input" value="{{importCode}}"></textarea>
+                </paper-autogrow-textarea>
+            </paper-input-decorator>
+
+            <paper-button affirmative>Close</paper-button>
+            <paper-button class="primary" affirmative autofocus on-tap="{{importSheet}}">Import</paper-button>
+        </paper-action-dialog>
+
+        <paper-toast id="toastSending" text="Sending..."><paper-spinner alt="Loading..." active></paper-spinner></paper-toast>
         <paper-toast id="toast" text="Sheet music sent."></paper-toast>
-        <paper-toast id="toastNoDest" text="The email recipient's address is not valid."></paper-toast>
-        <paper-toast id="toastError" text="Something went wrong."></paper-toast>
+        <paper-toast id="toastNoRecip" text="The email recipient's address is not valid."><div style="color: #eeff41;">Retry</div></paper-toast>
+        <paper-toast id="toastError" text="Something went wrong."><div style="color: #eeff41;">Retry</div></paper-toast>
     </template>
 
     <script>
     Polymer('music-editor', {
         ready: function() {
+            'use strict';
+
             this.notation = true;
             this.tablature = false;
             this.time = '4/4';
@@ -353,10 +422,28 @@
             this.key = 'C';
             this.tuning = 'standard';
 
-            this.note = 'C ';
+            this.note = '';
             this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
 
-            this.write = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning + " \nnotes " + this.note;
+            this.language = 'En';
+            this.notesLangage = {
+                'Fr': ['La', 'Si', 'Do', 'Ré', 'Mi', 'Fa', 'Sol'],
+                'En': ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+            }
+
+            this.inserted = [];
+            this.mesure = this.time.split('/');
+
+            this.durations = {
+                'ø': ':1',
+                '𝅗𝅥': ':2',
+                '♩': ':4',
+                '♪': ':8',
+                '𝅘𝅥𝅯': ':16',
+                '𝅘𝅥𝅰': ':32',
+                '𝅘𝅥𝅱': ':64',
+                '𝅘𝅥𝅲': ':128',
+            }
 
             this.clefs = [{
                 'name': 'Treble',
@@ -443,7 +530,7 @@
                 'value': 'dropd'
             }, {
                 'name': 'Eb',
-                'value': 'Eb'
+                'value': 'eb'
             }, {
                 'name': 'E/5',
                 'value': 'E/5'
@@ -463,35 +550,113 @@
                 'name': 'E/3',
                 'value': 'E/3'
             }];
+
+            // Initialize value of the music sheet right after Vextab is loaded.
+            var sheet = this;
+            setTimeout(function() {
+                $('.editor').val('tabstave notation=' + sheet.notation + ' tablature=' + sheet.tablature + ' time=' + sheet.time + ' clef=' + sheet.clef + ' key=' + sheet.key + ' tuning=' + sheet.tuning);
+                $('.editor').trigger(jQuery.Event('keyup'));
+            }, 1000);
         },
 
         observe: {
             'clef': 'updateData',
-            'time': 'updateData',
+            'time': 'updateTime',
             'key': 'updateData',
             'tuning': 'updateData',
             'note': 'updateData'
         },
 
+        /**
+         * Updates music score.
+         * @param  {string} oldValue The string that defines the music score before getting updated
+         * @param  {string} newValue The string updated
+         */
         updateData: function(oldValue, newValue) {
-            $('.editor').val('tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning + "\nnotes " + this.note);
+            'use strict';
+
+            var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
+
+            if (this.note.trim().length !== 0) {
+                str += "\nnotes " + this.note;
+            }
+
+            $('.editor').val(str);
             $('.editor').trigger(jQuery.Event('keyup'));
         },
 
-        shareSheet: function() {
-            var dialog = this.shadowRoot.querySelector('paper-action-dialog');
+        /**
+         * Updates and corrects bars to match the time signature.
+         * @param  {string} oldValue The string that defines the music score before getting updated
+         * @param  {string} newValue The string updated
+         */
+        updateTime: function(oldValue, newValue) {
+            'use strict';
+
+            this.mesure = this.time.split('/');
+
+            console.log('Inserted : ' + this.inserted);
+
+            if (this.mesure.length === 2 && this.mesure[1].length > 0) {
+                var final_notes = '';
+                var mesure = [];
+
+                for (var i = 0; i < this.mesure.length; i++) {
+                    mesure[i] = parseInt(this.mesure[i]);
+                }
+
+                for (var i = 0; i < this.inserted.length; i++) {
+                    var el = this.inserted[i];
+                    if (el[0] === ':') {
+                        var temps = parseInt(this.mesure[0]) / parseInt(el.substr(1, el.length - 1));
+                        if (mesure[0] > temps) {
+                            mesure[0] -= temps;
+                            el += ' | ';
+                            i += 1;
+                        } else {
+                            temps -= mesure[0];
+                            if (mesure[1] > 0) {
+                                mesure[0] = parseInt(this.mesure[0]) - temps;
+                                mesure[1] -= 1;
+                                el += ' | ';
+                            } else {
+                                el += ' =|= ';
+                            }
+                        }
+                    }
+
+                    final_notes += el;
+                    console.log(final_notes);
+                    this.inserted = final_notes.split(' ');
+                }
+
+                this.note = final_notes;
+            }
+
+            console.log('Inserted : ' + this.inserted);
+
+            this.updateData(oldValue, newValue);
+        },
+
+        /**
+         * Opens the dialog box to share the music sheet.
+         */
+        openShareDialog: function() {
+            'use strict';
+
+            var dialog = this.shadowRoot.querySelector('#sendPanel');
             if (!dialog)
                 return;
 
             dialog.toggle();
         },
 
-        listen: function() {
-
-        },
-
-
+        /**
+         * Downloads the music sheet converted to PDF.
+         */
         downloadSheet: function() {
+            'use strict';
+
             this.canvas = document.querySelector('.vex-canvas');
             this.context = this.canvas.getContext('2d');
 
@@ -502,91 +667,151 @@
 
             // Convert to image and give a filename.
             this.img = this.canvas.toDataURL('image/jpeg', 1.0);
-            this.filename = this.name || 'musicsheet';
+            this.filename = this.songtitle || 'musicscore';
 
             // Create the PDF.
             this.pdf = jsPDF();
 
             // Create music sheet information.
             this.pdf.setFontSize(22);
-            this.pdf.text(25, 25, this.name);
+            this.pdf.text(25, 25, this.songtitle);
             this.pdf.setFontSize(12);
             this.pdf.setTextColor(150);
             this.pdf.text(25, 32, 'Written with MusicScore Creator');
 
             // Add the information to the PDF.
-            this.pdf.addImage(this.img, 'JPEG', 10, 40);
+            this.pdf.addImage(this.img, 'JPEG', 24, 40);
             this.pdf.save(this.filename + '.pdf');
         },
 
+        /**
+         * Sends the music sheet via email.
+         */
         sendSheet: function() {
+            'use strict';
+
+            // Abort if there is no recipient.
             if (!this.destinataire) {
-                this.shadowRoot.querySelector('#toastNoDest').show();
+                this.shadowRoot.querySelector('#toastNoRecip').show();
                 return;
             }
 
-            this.username = 'Un utilisateur';
+            this.shadowRoot.querySelector('#toastSending').show();
+
+            var username = 'A user';
+            var songtitle = this.songtitle || 'Music sheet';
+
+            if (!this.message)
+                var message = '';
+            else
+                var message = '<div style="min-height:16px"></div><div style="min-height:1px;background-color:#eee"></div><div style="min-height:24px"></div><div style="display:table-row"><img style="display:table-cell" width="50" src="https://ci6.googleusercontent.com/proxy/s-yPWoeSrlt6ZaoEP0RnkHoJeHLVeSoqJqjDYitG58eUv3D1-OW-h7BVqADdvJRBzR92d16tqhuflDKOtJsB3Zn_ZHZKoZOqYZC_Q1gOYVOp=s0-d-e1-ft#https://ssl.gstatic.com/s2/profiles/images/silhouette64.png" alt=""><span style="display:table-cell;vertical-align:top;padding-left:16px;font-size:13px;line-height:18px;max-width:496px;color:#262626">' + this.message.replace(/\n/g, "<br>")  + '</span></div>';
+
+            if (!this.description)
+                var description = '';
+            else
+                var description = '<div style="min-height:16px"></div><div style="font-size:14px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell;">' + this.description.replace(/\n/g, "<br>")+ '<div></div></span></div></div>';
+
+            // Prepare the music sheet converted to PDF.
+            this.canvas = document.querySelector('.vex-canvas');
+            this.context = this.canvas.getContext('2d');
+
+            // Fill the background with white.
+            this.context.globalCompositeOperation = 'destination-over';
+            this.context.fillStyle = '#fff';
+            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Convert to image and give a filename.
+            this.img = this.canvas.toDataURL('image/jpeg', 1.0);
+            this.filename = this.songtitle || 'musicscore';
+
+            // Create the PDF.
+            this.pdf = jsPDF();
+
+            // Create music sheet information.
+            this.pdf.setFontSize(22);
+            this.pdf.text(25, 25, this.songtitle);
+            this.pdf.setFontSize(12);
+            this.pdf.setTextColor(150);
+            this.pdf.text(25, 32, 'Written with MusicScore Creator');
+
+            // Add the information to the PDF.
+            this.pdf.addImage(this.img, 'JPEG', 24, 40);
+
+            // To attach the PDF.
+            this.pdfBase64 = this.pdf.output('datauristring').split(',')[1];
+
+            // Stock the pointer to use in the Ajax element.
+            var polymer = this;
 
             $.ajax({
+                type: 'POST',
                 url: 'https://mandrillapp.com/api/1.0/messages/send.json',
                 data: {
                     'key': 'VzH_MdGdZGIpXEbE_LdjHA',
                     'message': {
                         'from_email': 'music@score.com',
+                        'from_name': 'MusicScore Creator',
                         'to': [{
                             'email': this.destinataire,
                             'type': 'to'
                         }],
+                        'attachments': [{
+                            'type': 'application/pdf;base64',
+                            'name': this.filename + '.pdf',
+                            'content': this.pdfBase64
+                        }],
                         'autotext': 'true',
-                        'subject': 'MusicScore Creator - Vous avez reçu une partition',
-                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title> <link rel="stylesheet" type="text/css" href="stylesheets/email.css"> <style>*{margin:0;padding:0;font-family:"Helvetica Neue",Helvetica,Helvetica,Arial,sans-serif}img{max-width:100%}.collapse{padding:0}body{width:100%!important;height:100%;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:none}a{color:#2BA6CB}table.body-wrap,table.head-wrap{width:100%;margin:0;padding:0}table.footer-wrap{clear:both!important;width:100%;border-top:1px solid #f7f7f7}h1,h2,h3,h4,h5,h6{margin-bottom:15px;font-family:HelveticaNeue-Light,"Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;line-height:1.1;color:#000}h1 small,h2 small,h3 small,h4 small,h5 small,h6 small{text-transform:none;font-size:60%;line-height:0;color:#6f6f6f}h1{font-size:44px;font-weight:200}h2{font-size:37px;font-weight:200}h3{font-size:27px;font-weight:500}h4{font-size:23px;font-weight:500}h5{font-size:17px;font-weight:900}h6{text-transform:uppercase;font-size:14px;font-weight:900}.collapse{margin:0!important;width:100%}p,ul{margin-bottom:10px;font-size:14px;font-weight:400;line-height:1.6}p.lead{font-size:17px}p.last{margin-bottom:0}ul li{margin-left:5px;list-style-position:inside}.container{display:block!important;clear:both!important;margin:0 auto!important;max-width:600px!important}.content{display:block;margin:0 auto;padding:15px;max-width:600px}.content table{width:100%}.column{float:left;width:300px}.column tr td{padding:15px}.column-wrap{margin:0 auto;padding:0!important;max-width:600px!important}.column table{width:100%}.social .column{float:left;width:280px;min-width:279px}.clear{display:block;clear:both}@media only screen and (max-width:600px){div[class=column]{float:none!important;width:auto!important}}</style></head><body bgcolor="#FFFFFF" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0"> <table class="head-wrap" bgcolor="#263238"> <tr> <td></td><td class="header container"> <div class="content"> <table bgcolor="#263238" width="100%" style="width: 100%"> <tr> <td align="center"> <h1 class="collapse" color="#fff" style="color: #fff; font-weight: 300;">MusicScore Creator</h1> </td></tr></table> </div></td><td></td></tr></table> <table class="body-wrap" bgcolor=""> <tr> <td></td><td class="container" align="" bgcolor="#FFFFFF"> <div class="content"> <table> <tr> <td> <h1>Félicitations !</h1> <p class="lead">' + this.username + ' vous a partagé une partition.</p><p><img src="http://placehold.it/600x300" alt=""></p><p><blockquote>' + this.description + '</blockquote></p><p>Retrouvez toutes vos partitions musicales sur MusicScore Creator.</p></td></tr></table> </div></td><td></td></tr></table> <table class="footer-wrap"> <tr> <td></td><td class="container"> <div class="content"> <table width="100%" style="width: 100%"> <tr> <td align="center" style="text-align: center;"> <p> <a href="#">Terms</a> | <a href="#">Privacy</a> | <a href="#"> <unsubscribe>Unsubscribe</unsubscribe> </a> </p></td></tr></table> </div></td><td></td></tr></table> </body></html>'
+                        'subject': 'MusicScore Creator - You received a music sheet',
+                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title><div><div style="width:100%;padding:24px 0 16px 0;background-color:#f5f5f5;text-align:center"><div style="display:inline-block;width:90%;max-width:680px;min-width:280px;text-align:left;font-family:Roboto,Arial,Helvetica,sans-serif"><div style="display:block;padding:0 2px"><div style="display:block;background:#fff;min-height:2px"></div></div><div style="border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0"><div style="padding:24px 32px 32px 32px;background:#fff;border-right:1px solid #eaeaea;border-left:1px solid #eaeaea" dir="ltr"><div style="font-size:14px;line-height:18px;color:#444"><a href="mailto:michel@lesecuriesdeventadour.com" style="color:inherit;text-decoration:none" target="_blank">' + username + '</a> <b>shared</b> a music sheet with you.</div><div style="min-height:24px"></div><div style="font-size:18px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle" target="_blank">' + songtitle + '</a><div></div></span></div></div>' + description + message + '<div style="min-height:32px"></div><div><a href="https://github.com/francoischalifour/musicscore-creator" style="background-color:#263238;border:1px solid #263238;border-radius:2px;color:#fff;display:inline-block;font-family:Arial;font-size:11px;font-weight:700;min-height:29px;line-height:29px;min-width:54px;outline:0;padding:0 8px;text-align:center;text-decoration:none" target="_blank">Go to MusicScore Creator</a></div></div></div><table style="width:100%;border-collapse:collapse"><tr><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#e5e5e5" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><tr height="1"><td width="1" bgcolor="#f5f5f5" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"></table><td style="width:100%;padding:0"><div style="min-height:1px;width:auto;border-top:1px solid #ddd;background:#eaeaea;border-bottom:1px solid #f0f0f0"></div><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#e5e5e5" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f5f5f5" style="padding:0"></table></table><table style="padding:14px 10px 0 10px" dir="ltr"><tr><td style="width:100%;font-size:11px;font-family:Open Sans,Arial;color:#646464;line-height:20px;min-height:40px;vertical-align:middle">Find all your musical sheets on <a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle">MusicScore Creator</a>.<td style="padding-left:20px;vertical-align:middle"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#888;text-decoration:none;vertical-align:middle" target="_blank">MusicScore Creator</a></table></div></div></div></body></html>'
                     }
                 }
             }).done(function() {
-                console.log('Sheet music sent.');
-                this.shadowRoot.querySelector('#toast').show();
+                polymer.shadowRoot.querySelector('#toast').show();
             }).fail(function() {
-                console.log('Something went wrong.');
-                this.shadowRoot.querySelector('#toastError').show();
+                polymer.shadowRoot.querySelector('#toastError').show();
             });
         },
 
         /**
-         * Tranposes a note higher on the panel settings.
+         * Imports a music sheet.
          */
-        transHigherUI: function() {
+        importSheet: function() {
             'use strict';
 
-            var note = this.note.toLowerCase();
-
-            var index = $.inArray(note, this.notes);
-            var next = this.notes[($.inArray(note, this.notes) + 1) % this.notes.length];
-
-            if (index !== -1) {
-                note = next.toUpperCase();
-                this.note = note;
-            } else {
-                console.log('Note introuvable');
-            }
+            // Copy the music imported code to the textarea linked to the music score.
+            $('.editor').val(this.importCode);
+            $('.editor').trigger(jQuery.Event('keyup'));
         },
 
         /**
-         * Transposes a note lower on the panel settings.
+         * Opens the dialog box to import a music sheet.
          */
-        transLowerUI: function() {
+        openImportDialog: function() {
             'use strict';
 
-            var note = this.note.toLowerCase();
+            // Open the dialog.
+            var dialog = this.shadowRoot.querySelector('#importPanel');
+            if (!dialog)
+                return;
 
-            var index = $.inArray(note, this.notes);
-            var prev = this.notes[($.inArray(note, this.notes) - 1) % this.notes.length];
+            dialog.toggle();
+        },
 
-            if (index !== -1) {
-                note = prev.toUpperCase();
-                this.note = note;
-            } else {
-                console.log('Note introuvable');
-            }
+        /**
+         * Opens the dialog box to export a music sheet.
+         */
+        openExportDialog: function() {
+            'use strict';
+
+            // Copy the music code to the panel.
+            this.exportCode = $('.editor').val();
+
+            // Open the dialog.
+            var dialog = this.shadowRoot.querySelector('#exportPanel');
+            if (!dialog)
+                return;
+
+            dialog.toggle();
         },
 
         /**
@@ -599,8 +824,8 @@
 
             var note = note.toLowerCase();
 
-            var index = $.inArray(note, notes);
-            var next = notes[($.inArray(note, notes) + 1) % notes.length];
+            var index = $.inArray(note, this.notes);
+            var next = this.notes[($.inArray(note, this.notes) + 1) % this.notes.length];
 
             if (index !== -1) {
                 return next.toUpperCase();
@@ -619,8 +844,8 @@
 
             var note = note.toLowerCase();
 
-            var index = $.inArray(note, notes);
-            var prev = notes[($.inArray(note, notes) - 1 + notes.length) % notes.length];
+            var index = $.inArray(note, this.notes);
+            var prev = this.notes[($.inArray(note, this.notes) - 1 + this.notes.length) % this.notes.length];
 
             if (index !== -1) {
                 return prev.toUpperCase();
@@ -631,51 +856,130 @@
 
         /**
          * Replaces all notes to transpose.
+         * @param {string} type Higher or Lower
          */
-        /*$(function() {
+        transpose: function() {
             'use strict';
 
-            var sheet1 = $('#sheetTrans').val().split('notes');
-            console.log(sheet1[1]);
+            var sheet1 = $('.editor').val().split('notes');
             var sheet = sheet1[1].split('');
-            var sheet2 = $('#sheetTrans').val();
-            console.log(sheet);
 
-            console.log(sheet.length);
-            console.log(notes.length);
+            var polymer = this;
 
             sheet.forEach(function(note) {
                 if (note.match(/[a-g]#?b?/i)) {
-                    console.log(transHigher(note));
-                    sheet2.replace(note, transHigher(note));
+                    var reg = new RegExp(note, "g");
+                    $('.editor').val($('.editor').val().replace(reg, polymer.transHigher(note)));
                 }
             });
 
-            console.log(sheet2);
-        });*/
+            // Refresh the canvas.
+            $('.editor').trigger(jQuery.Event('keyup'));
+        },
 
+        /**
+         * Adds the character in the textarea.
+         * @param  {object} element The character clicked
+         */
         keyboardClick: function(element) {
             'use strict';
 
-            var $this = element.toElement;
-            var character = $this.innerHTML;
+            var $this = element.target;
+            var character = $this.innerText;
 
-            // Delete
+            this.async(this.updateKeydown($this));
+
+            // Delete - erase
             if ($this.classList.contains('delete')) {
+                this.inserted = [];
                 this.note = '';
+                return;
+            } else if ($this.classList.contains('erase')) {
+                var str = this.note.trim();
+                if (this.inserted.length > 0) {
+                    var element = this.inserted.pop();
+                    this.note = str.substr(0, str.length - element.length);
+                }
                 return;
             }
 
-            // Special characters
-            if ($this.classList.contains('space')) character = ' ';
-            if ($this.classList.contains('tab')) character = "\t";
-            if ($this.classList.contains('return')) character = "\n";
-            if ($this.classList.contains('alteration') || $this.classList.contains('spechar')) {
-                this.note = '';
+            // Specific keyboard treatments
+            if ($this.classList.contains('return')) {
+                this.note += '\n';
+                character = '';
+                this.inserted.push('');
+            } else if ($this.classList.contains('hauteur')) {
+                character = '';
+                this.async(this.pitchClick($this));
+            } else if ($this.classList.contains('duration')) {
+                this.async(this.durationClick($this));
+                character = this.durations[character] + ' ';
+            } else if ($this.classList.contains('note')) {
+                character = this.notesLangage['En'][this.notesLangage[this.language].indexOf(character)];
+                character += $(this.shadowRoot.querySelector('.hauteur.active')).html();
             }
 
             // Add the character
-            this.note = this.note + character;
+            if (character.length > 0) {
+                this.inserted.push(character);
+            }
+            this.note += character;
+        },
+
+        /*
+         * TODO: refactor
+         */
+        updateKeydown: function(element) {
+            'use strict';
+
+            $(this.shadowRoot.querySelectorAll('.keydown')).each(function() {
+                $(this).removeClass('keydown');
+            });
+
+            element.classList.add('keydown');
+        },
+
+        durationClick: function(element) {
+            'use strict';
+
+            $(this.shadowRoot.querySelectorAll('.duration.active')).each(function() {
+                $(this).removeClass('active');
+            });
+
+            element.classList.add('active');
+        },
+
+        pitchClick: function(element) {
+            'use strict';
+
+            $(this.shadowRoot.querySelectorAll('.hauteur.active')).each(function() {
+                $(this).removeClass('active');
+            });
+
+            element.classList.add('active');
+        },
+
+        /**
+         * Translates the keyboard.
+         * @param  {object} element
+         */
+        translateLanguage: function(element) {
+            'use strict';
+
+            this.language = element.toElement.innerHTML;
+
+            if (this.language.length > 2) return; // To avoid the click between buttons.
+
+            if (this.language.toUpperCase() !== 'FR')
+                this.language === 'En';
+            else
+                this.language === 'Fr';
+
+            var polymer = this;
+
+            $(this.shadowRoot.querySelectorAll('.note')).each(function(index) {
+                $(this).html(polymer.notesLangage[polymer.language][index]);
+            });
         }
     });
     </script>

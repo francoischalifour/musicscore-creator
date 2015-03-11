@@ -64,7 +64,11 @@
                     <core-animated-pages id="pages" valueattr="hash" selected="{{route}}" transitions="slide-from-right">
                         <template repeat="{{page, i in pages}}">
                             <section hash="{{page.hash}}" layout vertical>
-                                <div>Loading...</div>
+                                <div>
+                                    <div horizontal center-justified layout>
+                                        <paper-spinner alt="Loading..." active></paper-spinner>
+                                    </div>
+                                </div>
                             </section>
                         </template>
                     </core-animated-pages>
