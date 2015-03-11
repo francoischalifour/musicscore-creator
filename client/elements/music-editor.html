@@ -248,6 +248,10 @@
                             <core-icon icon="social:person-add"></core-icon>
                             Share
                         </paper-button>
+                        <paper-button on-click="{{listen}}">
+                            <core-icon icon="social:notifications"></core-icon>
+                            Listen
+                        </paper-button>
                     </div>
                 </div>
 
@@ -482,6 +486,11 @@
             dialog.toggle();
         },
 
+        listen: function() {
+
+        },
+
+
         downloadSheet: function() {
             this.canvas = document.querySelector('.vex-canvas');
             this.context = this.canvas.getContext('2d');
@@ -670,4 +679,14 @@
         }
     });
     </script>
+
+    <script src="./js/MIDI/AudioDetect.js" type="text/javascript"></script>
+     <script src="./js/MIDI/LoadPlugin.js" type="text/javascript"></script>
+     <script src="./js/MIDI/Plugin.js" type="text/javascript"></script>
+     <script src="./js/MIDI/Player.js" type="text/javascript"></script>
+     <script src="./js/Window/DOMLoader.XMLHttp.js" type="text/javascript"></script>
+     <!-- extras -->
+     <script src="./inc/Base64.js" type="text/javascript"></script>
+     <script src="./inc/base64binary.js" type="text/javascript"></script>
+     
 </polymer-element>
