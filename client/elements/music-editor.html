@@ -629,6 +629,7 @@
             console.log('Inserted : ' + this.inserted);
 
             this.updateData();
+            this.updateData(oldValue, newValue);
         },
 
         /**
@@ -884,7 +885,6 @@
          * Adds the character in the textarea.
          * @param  {object} element The character clicked
          */
-
         keyboardClick: function(element) {
             'use strict';
 
@@ -964,10 +964,6 @@
                 this.inserted.push(character);
             }
             this.note += character;
-        },
-
-        checkTime: function() {
-
         },
 
         translateLanguage: function(element) {
