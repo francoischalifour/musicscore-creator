@@ -327,7 +327,7 @@
                         <li class="category">Durations</li>
                         <li class="duration">ø</li>
                         <li class="duration">𝅗𝅥</li>
-                        <li class="duration">♩</li>
+                        <li class="duration active">♩</li>
                         <li class="duration">♪</li>
                         <li class="duration">𝅘𝅥𝅯</li>
                         <li class="duration">𝅘𝅥𝅰</li>
@@ -421,6 +421,9 @@
             this.inserted = [];
             this.mesure = this.time.split('/');
 
+            this.duree = 0;
+            this.nb_mesures = 0;
+            this.duration = 4;
             this.durations = {
                 'ø': ':1',
                 '𝅗𝅥': ':2',
@@ -537,12 +540,15 @@
                 'name': 'E/3',
                 'value': 'E/3'
             }];
+        },
+
+        domReady: function() {
+            'use strict';
 
             // Initialize value of the music sheet right after Vextab is loaded.
-            var sheet = this;
+            var polymer = this;
             setTimeout(function() {
-                $('.editor').val('tabstave notation=' + sheet.notation + ' tablature=' + sheet.tablature + ' time=' + sheet.time + ' clef=' + sheet.clef + ' key=' + sheet.key + ' tuning=' + sheet.tuning);
-                $('.editor').trigger(jQuery.Event('keyup'));
+                polymer.async(polymer.updateData);
             }, 1000);
         },
 
@@ -559,7 +565,7 @@
          * @param  {string} oldValue The string that defines the music score before getting updated
          * @param  {string} newValue The string updated
          */
-        updateData: function(oldValue, newValue) {
+        updateData: function() {
             'use strict';
 
             var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
@@ -577,7 +583,7 @@
          * @param  {string} oldValue The string that defines the music score before getting updated
          * @param  {string} newValue The string updated
          */
-        updateTime: function(oldValue, newValue) {
+        updateTime: function() {
             'use strict';
 
             this.mesure = this.time.split('/');
@@ -622,7 +628,7 @@
 
             console.log('Inserted : ' + this.inserted);
 
-            this.updateData(oldValue, newValue);
+            this.updateData();
         },
 
         /**
@@ -864,17 +870,28 @@
             $('.editor').trigger(jQuery.Event('keyup'));
         },
 
+        changeSoloClassElement: function(element, selector, classInStake) {
+            'use strict';
+
+            $(this.shadowRoot.querySelectorAll(selector)).each(function() {
+                $(this).removeClass(classInStake);
+            });
+
+            element.classList.add(classInStake);
+        },
+
         /**
          * Adds the character in the textarea.
          * @param  {object} element The character clicked
          */
+
         keyboardClick: function(element) {
             'use strict';
 
             var $this = element.target;
             var character = $this.innerText;
 
-            this.async(this.updateKeydown($this));
+            this.async(this.changeSoloClassElement($this, '.keydown', 'keydown'));
 
             // Delete - erase
             if ($this.classList.contains('delete')) {
@@ -884,7 +901,13 @@
             } else if ($this.classList.contains('erase')) {
                 var str = this.note.trim();
                 if (this.inserted.length > 0) {
-                    var element = this.inserted.pop();
+                    var element = this.inserted.pop().trim();
+
+                    /*if (element.charAt(0) === ':') {
+                        this.duration = parseInt(element.substr(1, element.length - 1));
+
+                    }*/
+
                     this.note = str.substr(0, str.length - element.length);
                 }
                 return;
@@ -892,18 +915,48 @@
 
             // Specific keyboard treatments
             if ($this.classList.contains('return')) {
-                this.note += '\n';
+                this.note += "\n";
                 character = '';
                 this.inserted.push('');
-            } else if ($this.classList.contains('hauteur')) {
+            }
+            else if ($this.classList.contains('hauteur')) {
                 character = '';
-                this.async(this.pitchClick($this));
-            } else if ($this.classList.contains('duration')) {
-                this.async(this.durationClick($this));
+                this.async(this.changeSoloClassElement($this, '.hauteur.active', 'active'));
+            }
+            else if ($this.classList.contains('duration')) {
                 character = this.durations[character] + ' ';
-            } else if ($this.classList.contains('note')) {
+                this.async(this.changeSoloClassElement($this, '.duration.active', 'active'));
+
+                var duration_str = character.trim().substr(1, character.length - 1);
+                this.duration = parseInt(duration_str);
+            }
+            else if ($this.classList.contains('note')) {
                 character = this.notesLangage['En'][this.notesLangage[this.language].indexOf(character)];
                 character += $(this.shadowRoot.querySelector('.hauteur.active')).html();
+
+                this.duree += (1 / this.duration);
+                console.log(this.duree);
+
+                var mesure = this.time.split('/');
+                var mesure_length = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
+
+                if (this.duree >= mesure_length) {
+                    this.inserted.push(character);
+                    this.note += character;
+                    this.duree = 0;
+                    this.nb_mesures += 1;
+
+                    if ((this.nb_mesures > 1) && (this.nb_mesures % 2 == 0)) {
+                        var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
+
+                        this.note += "\n\n";
+                        this.note += str + "\nnotes " + ':' + this.duration;
+
+                        character = '';
+                    } else {
+                        character = ' | ';
+                    }
+                }
             }
 
             // Add the character
@@ -913,54 +966,21 @@
             this.note += character;
         },
 
-        /*
-         * TODO: refactor
-         */
-        updateKeydown: function(element) {
-            'use strict';
+        checkTime: function() {
 
-            $(this.shadowRoot.querySelectorAll('.keydown')).each(function() {
-                $(this).removeClass('keydown');
-            });
-
-            element.classList.add('keydown');
         },
 
-        durationClick: function(element) {
-            'use strict';
-
-            $(this.shadowRoot.querySelectorAll('.duration.active')).each(function() {
-                $(this).removeClass('active');
-            });
-
-            element.classList.add('active');
-        },
-
-        pitchClick: function(element) {
-            'use strict';
-
-            $(this.shadowRoot.querySelectorAll('.hauteur.active')).each(function() {
-                $(this).removeClass('active');
-            });
-
-            element.classList.add('active');
-        },
-
-        /**
-         * Translates the keyboard.
-         * @param  {object} element
-         */
         translateLanguage: function(element) {
             'use strict';
 
             this.language = element.toElement.innerHTML;
 
-            if (this.language.length > 2) return; // To avoid the click between buttons.
+            if (this.language.length != 2) return; // To avoid the click between buttons.
 
-            if (this.language.toUpperCase() !== 'FR')
-                this.language = 'En';
-            else
+            if (this.language.toUpperCase() === 'FR')
                 this.language = 'Fr';
+            else
+                this.language = 'En';
 
             var polymer = this;
 
@@ -970,987 +990,4 @@
         }
     });
     </script>
-</polymer-element>
-<link rel="import" href="../bower_components/paper-input/paper-autogrow-textarea.html">
-
-<polymer-element name="music-editor" attributes="notation tablature time clef key tuning">
-    <template>
-
-        <style>
-        :host {
-            display: block;
-        }
-        a {
-            text-decoration: none;
-            color: #5677fc;
-        }
-        .card {
-            display: block;
-            margin: 0 0 8px 0;
-            padding: 24px;
-            -webkit-border-radius: 2px;
-            border-radius: 2px;
-            background-color: #fff;
-            -webkit-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
-            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
-        }
-        @media(min-width:641px) {
-            .card {
-                margin: 8px;
-            }
-        }
-        .card-header {
-            font-size: 1.3em;
-            color: #263238;
-        }
-        .editor-error:not(:empty) .text {
-            display: block;
-            margin-bottom: 8px;
-            padding: 16px;
-            -webkit-border-radius: 2px;
-            border-radius: 2px;
-            color: #fff;
-            background-color: #ef5350;
-        }
-        .editor {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            -webkit-border-radius: 2px;
-            border-radius: 2px;
-            font-family: Monaco, Inconsolata, Consolas, sans-serif;
-            background-color: #eee;
-            resize: vertical;
-        }
-        .editor:focus,
-        .editor:active,
-        .editor:hover {
-            outline: none;
-        }
-        paper-button {
-            transition: background-color ease .15s;
-        }
-        paper-button:hover {
-            background: #eee;
-        }
-        .primary {
-            color: #2196f3;
-        }
-        paper-action-dialog {
-            width: 100%;
-        }
-        @media(min-width:640px) {
-            paper-action-dialog {
-                max-width: 640px;
-            }
-        }
-        core-icon {
-            margin-right: 16px;
-            color: inherit;
-        }
-        #keyboard {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-        #keyboard li {
-            float: left;
-            width: 40px;
-            height: 40px;
-            margin: 0 5px 5px 0;
-            border-radius: 2px;
-            text-align: center;
-            line-height: 40px;
-            background: #fafafa;
-            transition: all ease-in .15s;
-        }
-        .capslock,
-        .tab,
-        .left-shift {
-            clear: left;
-        }
-        #keyboard .tab,
-        #keyboard .delete {
-            width: 70px;
-        }
-        #keyboard .capslock {
-            width: 80px;
-        }
-        #keyboard .return,
-        #keyboard .erase {
-            width: 77px;
-        }
-        #keyboard .left-shift {
-            width: 95px;
-        }
-        #keyboard .right-shift {
-            width: 109px;
-        }
-        .lastitem {
-            margin-right: 0;
-        }
-        .lastitem + li {
-            clear: left;
-        }
-        .uppercase {
-            text-transform: uppercase;
-        }
-        #keyboard .space {
-            clear: left;
-            width: 681px;
-        }
-        .on {
-            display: none;
-        }
-        #keyboard li:hover {
-            position: relative;
-            background-color: #f1f1f1;
-            cursor: pointer;
-        }
-        #keyboard li.active {
-            background-color: #78909c;
-            color: #fff;
-        }
-        /* #keyboard li.keydown {
-            background-color: #9e9e9e;
-            color: #fff;
-        } */
-
-        #keyboard .category {
-            width: 92px;
-            background-color: #78909c;
-            color: #fff;
-            pointer-events: none;
-        }
-        </style>
-
-        <div horizontal layout wrap>
-
-            <div class="card" flex>
-
-                <div horizontal justified layout>
-                    <div horizontal start-justified layout>
-                        <div class="card-header">Sheet</div>
-                    </div>
-
-                    <div horizontal end-justified layout>
-                        <paper-button on-tap="{{downloadSheet}}">
-                            <core-icon icon="file-download"></core-icon>
-                            Download
-                        </paper-button>
-                        <paper-button on-tap="{{openShareDialog}}">
-                            <core-icon icon="social:person-add"></core-icon>
-                            Share
-                        </paper-button>
-
-                        <paper-menu-button>
-                            <paper-button>
-                                <core-icon icon="more-vert"></core-icon>
-                                More
-                            </paper-button>
-                            <paper-dropdown halign="right" class="dropdown">
-                                <core-menu>
-                                    <paper-item on-tap="{{openImportDialog}}">
-                                        Import
-                                    </paper-item>
-                                    <paper-item on-tap="{{openExportDialog}}">
-                                        Export
-                                    </paper-item>
-                                </core-menu>
-                            </paper-dropdown>
-                        </paper-menu-button>
-                    </div>
-                </div>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Title</h4>
-                    </div>
-                    <div horizontal layout flex four>
-                        <div horizontal layout flex>
-                            <paper-input value="{{songtitle}}" label="Title" flex></paper-input>
-                        </div>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Description</h4>
-                    </div>
-                    <div horizontal layout flex four>
-                        <div horizontal layout flex>
-                            <paper-input-decorator label="Description" flex>
-                                <paper-autogrow-textarea>
-                                    <textarea is="core-input" value="{{description}}"></textarea>
-                                </paper-autogrow-textarea>
-                            </paper-input-decorator>
-                        </div>
-                    </div>
-                </core-label>
-
-            </div>
-
-            <div class="card" flex>
-
-                <div class="card-header">
-                    Settings
-                </div>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Clef</h4>
-                    </div>
-                    <div horizontal layout flex three>
-                        <paper-dropdown-menu flex>
-                            <paper-dropdown class="dropdown">
-                                <core-menu selected="{{clef}}" valueattr="value" class="menu">
-                                    <template repeat="{{clef in clefs}}">
-                                        <paper-item value="{{clef.value}}" noink>{{clef.name}}</paper-item>
-                                    </template>
-                                </core-menu>
-                            </paper-dropdown>
-                        </paper-dropdown-menu>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Key</h4>
-                    </div>
-                    <div horizontal layout flex three>
-                        <paper-dropdown-menu flex>
-                            <paper-dropdown class="dropdown">
-                                <core-menu selected="{{key}}" valueattr="value" class="menu">
-                                    <template repeat="{{key in keys}}">
-                                        <paper-item value="{{key.name}}" noink>{{key.name}}</paper-item>
-                                    </template>
-                                </core-menu>
-                            </paper-dropdown>
-                        </paper-dropdown-menu>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Time signature</h4>
-                    </div>
-                    <div horizontal layout flex three>
-                        <paper-input value="{{time}}" label="C, C|, #/#" value="4/4" flex></paper-input>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Tuning</h4>
-                    </div>
-                    <div horizontal layout flex three>
-                        <paper-dropdown-menu flex>
-                            <paper-dropdown class="dropdown">
-                                <core-menu selected="{{tuning}}" valueattr="value" class="menu">
-                                    <template repeat="{{tunning in tunings}}">
-                                        <paper-item value="{{tunning.value}}" noink>{{tunning.name}}</paper-item>
-                                    </template>
-                                </core-menu>
-                            </paper-dropdown>
-                        </paper-dropdown-menu>
-                    </div>
-                </core-label>
-
-                <core-label horizontal layout flex>
-                    <div horizontal layout flex>
-                        <h4>Transpose</h4>
-                    </div>
-                    <div horizontal layout flex three>
-                        <paper-button on-tap="{{transpose}}">-</paper-button>
-                        <paper-button on-tap="{{transpose}}">+</paper-button>
-                    </div>
-                </core-label>
-            </div>
-        </div>
-
-        <div layout horizontal>
-            <div class="card" flex>
-                <div horizontal justified layout>
-                    <div horizontal start-justified layout>
-                        <div class="card-header">{{songtitle}}</div>
-                    </div>
-
-                    <div horizontal end-justified layout on-click="{{translateLanguage}}">
-                        <paper-button>Fr</paper-button>
-                        <paper-button>En</paper-button>
-                    </div>
-                </div>
-
-                <p>
-                    <content></content>
-                </p>
-
-                <p>
-                    <ul id="keyboard" on-tap="{{keyboardClick}}">
-                        <li class="category">Notes</li>
-                        <li class="note">A</li>
-                        <li class="note">B</li>
-                        <li class="note">C</li>
-                        <li class="note">D</li>
-                        <li class="note">E</li>
-                        <li class="note">F</li>
-                        <li class="note">G</li>
-                        <li class="note lastitem">rest</li>
-
-                        <li class="category">Durations</li>
-                        <li class="duration">ø</li>
-                        <li class="duration">𝅗𝅥</li>
-                        <li class="duration">♩</li>
-                        <li class="duration">♪</li>
-                        <li class="duration">𝅘𝅥𝅯</li>
-                        <li class="duration">𝅘𝅥𝅰</li>
-                        <li class="duration">𝅘𝅥𝅱</li>
-                        <li class="duration lastitem">𝅘𝅥𝅲</li>
-
-                        <li class="category">Bars</li>
-                        <li class="bar"> | </li>
-                        <li class="bar"> =|| </li>
-                        <li class="bar"> =|: </li>
-                        <li class="bar"> =:| </li>
-                        <li class="bar"> =:: </li>
-                        <li class="bar lastitem"> =|= </li>
-
-                        <li class="category">Pitch</li>
-                        <li class="hauteur">/1 </li>
-                        <li class="hauteur">/2 </li>
-                        <li class="hauteur">/3 </li>
-                        <li class="hauteur active">/4 </li>
-                        <li class="hauteur">/5 </li>
-                        <li class="hauteur lastitem">/6 </li>
-
-                        <li class="category">Options</li>
-                        <li class="delete">delete</li>
-                        <li class="return">return</li>
-                        <li class="erase lastitem">erase</li>
-                    </ul>
-                </p>
-            </div>
-        </div>
-
-        <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="sendPanel" heading="Share with others">
-            <paper-input-decorator floatingLabel label="Enter email address...">
-                <input is="core-input" type="mail" value="{{destinataire}}" required>
-            </paper-input-decorator>
-
-            <paper-input-decorator floatingLabel label="Incude a personal message...">
-                <paper-autogrow-textarea>
-                    <textarea is="core-input" value="{{message}}"></textarea>
-                </paper-autogrow-textarea>
-            </paper-input-decorator>
-
-            <paper-button affirmative>Close</paper-button>
-            <paper-button class="primary" affirmative autofocus on-tap="{{sendSheet}}">Share</paper-button>
-        </paper-action-dialog>
-
-        <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="exportPanel" heading="Export">
-            <pre><code>{{exportCode}}</code></pre>
-
-            <paper-button affirmative>Close</paper-button>
-        </paper-action-dialog>
-
-        <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="importPanel" heading="Import">
-            <paper-input-decorator floatingLabel label="Code">
-                <paper-autogrow-textarea>
-                    <textarea is="core-input" value="{{importCode}}"></textarea>
-                </paper-autogrow-textarea>
-            </paper-input-decorator>
-
-            <paper-button affirmative>Close</paper-button>
-            <paper-button class="primary" affirmative autofocus on-tap="{{importSheet}}">Import</paper-button>
-        </paper-action-dialog>
-
-        <paper-toast id="toastSending" text="Sending..."><paper-spinner alt="Loading..." active></paper-spinner></paper-toast>
-        <paper-toast id="toast" text="Sheet music sent."></paper-toast>
-        <paper-toast id="toastNoRecip" text="The email recipient's address is not valid."><div style="color: #eeff41;">Retry</div></paper-toast>
-        <paper-toast id="toastError" text="Something went wrong."><div style="color: #eeff41;">Retry</div></paper-toast>
-    </template>
-
-    <script>
-    Polymer('music-editor', {
-        ready: function() {
-            'use strict';
-
-            this.notation = true;
-            this.tablature = false;
-            this.time = '4/4';
-            this.clef = 'treble';
-            this.key = 'C';
-            this.tuning = 'standard';
-
-            this.note = '';
-            this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
-
-            this.language = 'En';
-            this.notesLangage = {
-                'Fr': ['La', 'Si', 'Do', 'Ré', 'Mi', 'Fa', 'Sol'],
-                'En': ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-            }
-
-            this.inserted = [];
-            this.mesure = this.time.split('/');
-
-            this.durations = {
-                'ø': ':1',
-                '𝅗𝅥': ':2',
-                '♩': ':4',
-                '♪': ':8',
-                '𝅘𝅥𝅯': ':16',
-                '𝅘𝅥𝅰': ':32',
-                '𝅘𝅥𝅱': ':64',
-                '𝅘𝅥𝅲': ':128',
-            }
-
-            this.clefs = [{
-                'name': 'Treble',
-                'value': 'treble'
-            }, {
-                'name': 'Alto',
-                'value': 'alto'
-            }, {
-                'name': 'Tenor',
-                'value': 'tenor'
-            }, {
-                'name': 'Bass',
-                'value': 'bass'
-            }, {
-                'name': 'Percussion',
-                'value': 'percussion'
-            }];
-
-            this.keys = [{
-                'name': 'C'
-            }, {
-                'name': 'Am'
-            }, {
-                'name': 'F'
-            }, {
-                'name': 'Dm'
-            }, {
-                'name': 'Bb'
-            }, {
-                'name': 'Gm'
-            }, {
-                'name': 'Eb'
-            }, {
-                'name': 'Ab'
-            }, {
-                'name': 'Fm'
-            }, {
-                'name': 'Db'
-            }, {
-                'name': 'Bbm'
-            }, {
-                'name': 'Gb'
-            }, {
-                'name': 'Ebm'
-            }, {
-                'name': 'Cb'
-            }, {
-                'name': 'Abm'
-            }, {
-                'name': 'G'
-            }, {
-                'name': 'Em'
-            }, {
-                'name': 'D'
-            }, {
-                'name': 'Bm'
-            }, {
-                'name': 'A'
-            }, {
-                'name': 'F#m'
-            }, {
-                'name': 'E'
-            }, {
-                'name': 'C#m'
-            }, {
-                'name': 'B'
-            }, {
-                'name': 'G#m'
-            }, {
-                'name': 'F#'
-            }, {
-                'name': 'D#m'
-            }, {
-                'name': 'C#'
-            }, {
-                'name': 'A#m'
-            }];
-
-            this.tunings = [{
-                'name': 'Standard',
-                'value': 'standard'
-            }, {
-                'name': 'Drop D',
-                'value': 'dropd'
-            }, {
-                'name': 'Eb',
-                'value': 'eb'
-            }, {
-                'name': 'E/5',
-                'value': 'E/5'
-            }, {
-                'name': 'B/4',
-                'value': 'B/4'
-            }, {
-                'name': 'G/4',
-                'value': 'G/4'
-            }, {
-                'name': 'D/4',
-                'value': 'D/4'
-            }, {
-                'name': 'A/3',
-                'value': 'A/3'
-            }, {
-                'name': 'E/3',
-                'value': 'E/3'
-            }];
-
-            // Initialize value of the music sheet right after Vextab is loaded.
-            var sheet = this;
-            setTimeout(function() {
-                $('.editor').val('tabstave notation=' + sheet.notation + ' tablature=' + sheet.tablature + ' time=' + sheet.time + ' clef=' + sheet.clef + ' key=' + sheet.key + ' tuning=' + sheet.tuning);
-                $('.editor').trigger(jQuery.Event('keyup'));
-            }, 1000);
-        },
-
-        observe: {
-            'clef': 'updateData',
-            'time': 'updateTime',
-            'key': 'updateData',
-            'tuning': 'updateData',
-            'note': 'updateData'
-        },
-
-        /**
-         * Updates music score.
-         * @param  {string} oldValue The string that defines the music score before getting updated
-         * @param  {string} newValue The string updated
-         */
-        updateData: function(oldValue, newValue) {
-            'use strict';
-
-            var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
-
-            if (this.note.trim().length !== 0) {
-                str += "\nnotes " + this.note;
-            }
-
-            $('.editor').val(str);
-            $('.editor').trigger(jQuery.Event('keyup'));
-        },
-
-        /**
-         * Updates and corrects bars to match the time signature.
-         * @param  {string} oldValue The string that defines the music score before getting updated
-         * @param  {string} newValue The string updated
-         */
-        updateTime: function(oldValue, newValue) {
-            'use strict';
-
-            this.mesure = this.time.split('/');
-
-            console.log('Inserted : ' + this.inserted);
-
-            if (this.mesure.length === 2 && this.mesure[1].length > 0) {
-                var final_notes = '';
-                var mesure = [];
-
-                for (var i = 0; i < this.mesure.length; i++) {
-                    mesure[i] = parseInt(this.mesure[i]);
-                }
-
-                for (var i = 0; i < this.inserted.length; i++) {
-                    var el = this.inserted[i];
-                    if (el[0] === ':') {
-                        var temps = parseInt(this.mesure[0]) / parseInt(el.substr(1, el.length - 1));
-                        if (mesure[0] > temps) {
-                            mesure[0] -= temps;
-                            el += ' | ';
-                            i += 1;
-                        } else {
-                            temps -= mesure[0];
-                            if (mesure[1] > 0) {
-                                mesure[0] = parseInt(this.mesure[0]) - temps;
-                                mesure[1] -= 1;
-                                el += ' | ';
-                            } else {
-                                el += ' =|= ';
-                            }
-                        }
-                    }
-
-                    final_notes += el;
-                    console.log(final_notes);
-                    this.inserted = final_notes.split(' ');
-                }
-
-                this.note = final_notes;
-            }
-
-            console.log('Inserted : ' + this.inserted);
-
-            this.updateData(oldValue, newValue);
-        },
-
-        /**
-         * Opens the dialog box to share the music sheet.
-         */
-        openShareDialog: function() {
-            'use strict';
-
-            var dialog = this.shadowRoot.querySelector('#sendPanel');
-            if (!dialog)
-                return;
-
-            dialog.toggle();
-        },
-
-        /**
-         * Downloads the music sheet converted to PDF.
-         */
-        downloadSheet: function() {
-            'use strict';
-
-            this.canvas = document.querySelector('.vex-canvas');
-            this.context = this.canvas.getContext('2d');
-
-            // Fill the background with white.
-            this.context.globalCompositeOperation = 'destination-over';
-            this.context.fillStyle = '#fff';
-            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-            // Convert to image and give a filename.
-            this.img = this.canvas.toDataURL('image/jpeg', 1.0);
-            this.filename = this.songtitle || 'musicscore';
-
-            // Create the PDF.
-            this.pdf = jsPDF();
-
-            // Create music sheet information.
-            this.pdf.setFontSize(22);
-            this.pdf.text(25, 25, this.songtitle);
-            this.pdf.setFontSize(12);
-            this.pdf.setTextColor(150);
-            this.pdf.text(25, 32, 'Written with MusicScore Creator');
-
-            // Add the information to the PDF.
-            this.pdf.addImage(this.img, 'JPEG', 24, 40);
-            this.pdf.save(this.filename + '.pdf');
-        },
-
-        /**
-         * Sends the music sheet via email.
-         */
-        sendSheet: function() {
-            'use strict';
-
-            // Abort if there is no recipient.
-            if (!this.destinataire) {
-                this.shadowRoot.querySelector('#toastNoRecip').show();
-                return;
-            }
-
-            this.shadowRoot.querySelector('#toastSending').show();
-
-            var username = 'A user';
-            var songtitle = this.songtitle || 'Music sheet';
-
-            if (!this.message)
-                var message = '';
-            else
-                var message = '<div style="min-height:16px"></div><div style="min-height:1px;background-color:#eee"></div><div style="min-height:24px"></div><div style="display:table-row"><img style="display:table-cell" width="50" src="https://ci6.googleusercontent.com/proxy/s-yPWoeSrlt6ZaoEP0RnkHoJeHLVeSoqJqjDYitG58eUv3D1-OW-h7BVqADdvJRBzR92d16tqhuflDKOtJsB3Zn_ZHZKoZOqYZC_Q1gOYVOp=s0-d-e1-ft#https://ssl.gstatic.com/s2/profiles/images/silhouette64.png" alt=""><span style="display:table-cell;vertical-align:top;padding-left:16px;font-size:13px;line-height:18px;max-width:496px;color:#262626">' + this.message.replace(/\n/g, "<br>")  + '</span></div>';
-
-            if (!this.description)
-                var description = '';
-            else
-                var description = '<div style="min-height:16px"></div><div style="font-size:14px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell;">' + this.description.replace(/\n/g, "<br>")+ '<div></div></span></div></div>';
-
-            // Prepare the music sheet converted to PDF.
-            this.canvas = document.querySelector('.vex-canvas');
-            this.context = this.canvas.getContext('2d');
-
-            // Fill the background with white.
-            this.context.globalCompositeOperation = 'destination-over';
-            this.context.fillStyle = '#fff';
-            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-            // Convert to image and give a filename.
-            this.img = this.canvas.toDataURL('image/jpeg', 1.0);
-            this.filename = this.songtitle || 'musicscore';
-
-            // Create the PDF.
-            this.pdf = jsPDF();
-
-            // Create music sheet information.
-            this.pdf.setFontSize(22);
-            this.pdf.text(25, 25, this.songtitle);
-            this.pdf.setFontSize(12);
-            this.pdf.setTextColor(150);
-            this.pdf.text(25, 32, 'Written with MusicScore Creator');
-
-            // Add the information to the PDF.
-            this.pdf.addImage(this.img, 'JPEG', 24, 40);
-
-            // To attach the PDF.
-            this.pdfBase64 = this.pdf.output('datauristring').split(',')[1];
-
-            // Stock the pointer to use in the Ajax element.
-            var polymer = this;
-
-            $.ajax({
-                type: 'POST',
-                url: 'https://mandrillapp.com/api/1.0/messages/send.json',
-                data: {
-                    'key': 'VzH_MdGdZGIpXEbE_LdjHA',
-                    'message': {
-                        'from_email': 'music@score.com',
-                        'from_name': 'MusicScore Creator',
-                        'to': [{
-                            'email': this.destinataire,
-                            'type': 'to'
-                        }],
-                        'attachments': [{
-                            'type': 'application/pdf;base64',
-                            'name': this.filename + '.pdf',
-                            'content': this.pdfBase64
-                        }],
-                        'autotext': 'true',
-                        'subject': 'MusicScore Creator - You received a music sheet',
-                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title><div><div style="width:100%;padding:24px 0 16px 0;background-color:#f5f5f5;text-align:center"><div style="display:inline-block;width:90%;max-width:680px;min-width:280px;text-align:left;font-family:Roboto,Arial,Helvetica,sans-serif"><div style="display:block;padding:0 2px"><div style="display:block;background:#fff;min-height:2px"></div></div><div style="border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0"><div style="padding:24px 32px 32px 32px;background:#fff;border-right:1px solid #eaeaea;border-left:1px solid #eaeaea" dir="ltr"><div style="font-size:14px;line-height:18px;color:#444"><a href="mailto:michel@lesecuriesdeventadour.com" style="color:inherit;text-decoration:none" target="_blank">' + username + '</a> <b>shared</b> a music sheet with you.</div><div style="min-height:24px"></div><div style="font-size:18px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle" target="_blank">' + songtitle + '</a><div></div></span></div></div>' + description + message + '<div style="min-height:32px"></div><div><a href="https://github.com/francoischalifour/musicscore-creator" style="background-color:#263238;border:1px solid #263238;border-radius:2px;color:#fff;display:inline-block;font-family:Arial;font-size:11px;font-weight:700;min-height:29px;line-height:29px;min-width:54px;outline:0;padding:0 8px;text-align:center;text-decoration:none" target="_blank">Go to MusicScore Creator</a></div></div></div><table style="width:100%;border-collapse:collapse"><tr><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#e5e5e5" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><tr height="1"><td width="1" bgcolor="#f5f5f5" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"></table><td style="width:100%;padding:0"><div style="min-height:1px;width:auto;border-top:1px solid #ddd;background:#eaeaea;border-bottom:1px solid #f0f0f0"></div><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#e5e5e5" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f5f5f5" style="padding:0"></table></table><table style="padding:14px 10px 0 10px" dir="ltr"><tr><td style="width:100%;font-size:11px;font-family:Open Sans,Arial;color:#646464;line-height:20px;min-height:40px;vertical-align:middle">Find all your musical sheets on <a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle">MusicScore Creator</a>.<td style="padding-left:20px;vertical-align:middle"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#888;text-decoration:none;vertical-align:middle" target="_blank">MusicScore Creator</a></table></div></div></div></body></html>'
-                    }
-                }
-            }).done(function() {
-                polymer.shadowRoot.querySelector('#toast').show();
-            }).fail(function() {
-                polymer.shadowRoot.querySelector('#toastError').show();
-            });
-        },
-
-        /**
-         * Imports a music sheet.
-         */
-        importSheet: function() {
-            'use strict';
-
-            // Copy the music imported code to the textarea linked to the music score.
-            $('.editor').val(this.importCode);
-            $('.editor').trigger(jQuery.Event('keyup'));
-        },
-
-        /**
-         * Opens the dialog box to import a music sheet.
-         */
-        openImportDialog: function() {
-            'use strict';
-
-            // Open the dialog.
-            var dialog = this.shadowRoot.querySelector('#importPanel');
-            if (!dialog)
-                return;
-
-            dialog.toggle();
-        },
-
-        /**
-         * Opens the dialog box to export a music sheet.
-         */
-        openExportDialog: function() {
-            'use strict';
-
-            // Copy the music code to the panel.
-            this.exportCode = $('.editor').val();
-
-            // Open the dialog.
-            var dialog = this.shadowRoot.querySelector('#exportPanel');
-            if (!dialog)
-                return;
-
-            dialog.toggle();
-        },
-
-        /**
-         * Transposes a note higher.
-         * @param  {string} note The note to transpose
-         * @return {string} the note higher
-         */
-        transHigher: function(note) {
-            'use strict';
-
-            var note = note.toLowerCase();
-
-            var index = $.inArray(note, this.notes);
-            var next = this.notes[($.inArray(note, this.notes) + 1) % this.notes.length];
-
-            if (index !== -1) {
-                return next.toUpperCase();
-            } else {
-                return 'ERROR';
-            }
-        },
-
-        /**
-         * Transposes a note lower.
-         * @param  {string} note The note to transpose
-         * @return {string} the note lower
-         */
-        transLower: function(note) {
-            'use strict';
-
-            var note = note.toLowerCase();
-
-            var index = $.inArray(note, this.notes);
-            var prev = this.notes[($.inArray(note, this.notes) - 1 + this.notes.length) % this.notes.length];
-
-            if (index !== -1) {
-                return prev.toUpperCase();
-            } else {
-                return 'ERROR';
-            }
-        },
-
-        /**
-         * Replaces all notes to transpose.
-         * @param {string} type Higher or Lower
-         */
-        transpose: function() {
-            'use strict';
-
-            var sheet1 = $('.editor').val().split('notes');
-            var sheet = sheet1[1].split('');
-
-            var polymer = this;
-
-            sheet.forEach(function(note) {
-                if (note.match(/[a-g]#?b?/i)) {
-                    var reg = new RegExp(note, "g");
-                    $('.editor').val($('.editor').val().replace(reg, polymer.transHigher(note)));
-                }
-            });
-
-            // Refresh the canvas.
-            $('.editor').trigger(jQuery.Event('keyup'));
-        },
-
-        /**
-         * Adds the character in the textarea.
-         * @param  {object} element The character clicked
-         */
-        keyboardClick: function(element) {
-            'use strict';
-
-            var $this = element.target;
-            var character = $this.innerText;
-
-            this.async(this.updateKeydown($this));
-
-            // Delete - erase
-            if ($this.classList.contains('delete')) {
-                this.inserted = [];
-                this.note = '';
-                return;
-            } else if ($this.classList.contains('erase')) {
-                var str = this.note.trim();
-                if (this.inserted.length > 0) {
-                    var element = this.inserted.pop();
-                    this.note = str.substr(0, str.length - element.length);
-                }
-                return;
-            }
-
-            // Specific keyboard treatments
-            if ($this.classList.contains('return')) {
-                this.note += '\n';
-                character = '';
-                this.inserted.push('');
-            } else if ($this.classList.contains('hauteur')) {
-                character = '';
-                this.async(this.pitchClick($this));
-            } else if ($this.classList.contains('duration')) {
-                this.async(this.durationClick($this));
-                character = this.durations[character] + ' ';
-            } else if ($this.classList.contains('note')) {
-                character = this.notesLangage['En'][this.notesLangage[this.language].indexOf(character)];
-                character += $(this.shadowRoot.querySelector('.hauteur.active')).html();
-            }
-
-            // Add the character
-            if (character.length > 0) {
-                this.inserted.push(character);
-            }
-            this.note += character;
-        },
-
-        /*
-         * TODO: refactor
-         */
-        updateKeydown: function(element) {
-            'use strict';
-
-            $(this.shadowRoot.querySelectorAll('.keydown')).each(function() {
-                $(this).removeClass('keydown');
-            });
-
-            element.classList.add('keydown');
-        },
-
-        durationClick: function(element) {
-            'use strict';
-
-            $(this.shadowRoot.querySelectorAll('.duration.active')).each(function() {
-                $(this).removeClass('active');
-            });
-
-            element.classList.add('active');
-        },
-
-        pitchClick: function(element) {
-            'use strict';
-
-            $(this.shadowRoot.querySelectorAll('.hauteur.active')).each(function() {
-                $(this).removeClass('active');
-            });
-
-            element.classList.add('active');
-        },
-
-        /**
-         * Translates the keyboard.
-         * @param  {object} element
-         */
-        translateLanguage: function(element) {
-            'use strict';
-
-            this.language = element.toElement.innerHTML;
-
-            if (this.language.length > 2) return; // To avoid the click between buttons.
-
-            if (this.language.toUpperCase() !== 'FR')
-                this.language = 'En';
-            else
-                this.language = 'Fr';
-
-            var polymer = this;
-
-            $(this.shadowRoot.querySelectorAll('.note')).each(function(index) {
-                $(this).html(polymer.notesLangage[polymer.language][index]);
-            });
-        }
-    });
-    </script>
-
-    <script src="./js/MIDI/AudioDetect.js" type="text/javascript"></script>
-     <script src="./js/MIDI/LoadPlugin.js" type="text/javascript"></script>
-     <script src="./js/MIDI/Plugin.js" type="text/javascript"></script>
-     <script src="./js/MIDI/Player.js" type="text/javascript"></script>
-     <script src="./js/Window/DOMLoader.XMLHttp.js" type="text/javascript"></script>
-     <!-- extras -->
-     <script src="./inc/Base64.js" type="text/javascript"></script>
-     <script src="./inc/base64binary.js" type="text/javascript"></script>
-
 </polymer-element>
