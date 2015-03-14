@@ -830,26 +830,7 @@
             // Refresh the canvas.
             $('.editor').trigger(jQuery.Event('keyup'));
          },
-        /*transHigher: function(note) {
-            'use strict';
 
-            var note = note.toLowerCase();
-
-            var index = $.inArray(note, this.notes);
-            var next = this.notes[($.inArray(note, this.notes) + 1) % this.notes.length];
-            console.log(note + ' -> ' + next.toUpperCase());
-
-            if (index !== -1) {
-                return next.toUpperCase();
-            } else {
-                return 'ERROR';
-            }
-        },*/
-
-        /**
-         * Transposes a note lower.
-         * @param {string} type Lower
-         */
          transLower: function() {
             'use strict';
 
@@ -879,20 +860,6 @@
             // Refresh the canvas.
             $('.editor').trigger(jQuery.Event('keyup'));
          },
-        /*transLower: function(note) {
-            'use strict';
-
-            var note = note.toLowerCase();
-
-            var index = $.inArray(note, this.notes);
-            var prev = this.notes[($.inArray(note, this.notes) - 1 + this.notes.length) % this.notes.length];
-
-            if (index !== -1) {
-                return prev.toUpperCase();
-            } else {
-                return 'ERROR';
-            }
-        },*/
 
         /**
          * Return tables with all notes to transpose.
@@ -962,37 +929,6 @@
 
             return textEdit;
          },
-        /*transpose: function() {
-            'use strict';
-
-            var sheet1 = $('.editor').val().split('notes');
-            var sheet = sheet1[1].split('');
-
-            var polymer = this;
-
-            var cpt = 0;
-            var noteVerif;
-            sheet.forEach(function(note) {
-                //On cherche à savoir s'il s'agit d'une note de style "C#" ou "D#" par exemple
-                if (note.match('#')) {
-                    noteVerif = sheet[cpt-1]+note;
-                } else if(sheet[cpt+1] == '#') {
-                    noteVerif = 'no';
-                } else {
-                    noteVerif = note;
-                }
-
-                //transposition
-                if (noteVerif.match(/[a-g]#?b?/i)) {
-                    var reg = new RegExp(noteVerif, "g");
-                    $('.editor').val($('.editor').val().replace(reg, polymer.transHigher(noteVerif)));
-                }
-                cpt++;
-            });
-
-            // Refresh the canvas.
-            $('.editor').trigger(jQuery.Event('keyup'));
-        },*/
 
         changeSoloClassElement: function(element, selector, classInStake) {
             'use strict';
