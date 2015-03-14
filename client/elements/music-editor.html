@@ -327,7 +327,7 @@
                         <li class="category">Durations</li>
                         <li class="duration">ø</li>
                         <li class="duration">𝅗𝅥</li>
-                        <li class="duration">♩</li>
+                        <li class="duration active">♩</li>
                         <li class="duration">♪</li>
                         <li class="duration">𝅘𝅥𝅯</li>
                         <li class="duration">𝅘𝅥𝅰</li>
@@ -421,6 +421,9 @@
             this.inserted = [];
             this.mesure = this.time.split('/');
 
+            this.duree = 0;
+            this.nb_mesures = 0;
+            this.duration = 4;
             this.durations = {
                 'ø': ':1',
                 '𝅗𝅥': ':2',
@@ -537,12 +540,15 @@
                 'name': 'E/3',
                 'value': 'E/3'
             }];
+        },
+
+        domReady: function() {
+            'use strict';
 
             // Initialize value of the music sheet right after Vextab is loaded.
-            var sheet = this;
+            var polymer = this;
             setTimeout(function() {
-                $('.editor').val('tabstave notation=' + sheet.notation + ' tablature=' + sheet.tablature + ' time=' + sheet.time + ' clef=' + sheet.clef + ' key=' + sheet.key + ' tuning=' + sheet.tuning);
-                $('.editor').trigger(jQuery.Event('keyup'));
+                polymer.async(polymer.updateData);
             }, 1000);
         },
 
@@ -559,7 +565,7 @@
          * @param  {string} oldValue The string that defines the music score before getting updated
          * @param  {string} newValue The string updated
          */
-        updateData: function(oldValue, newValue) {
+        updateData: function() {
             'use strict';
 
             var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
@@ -577,7 +583,7 @@
          * @param  {string} oldValue The string that defines the music score before getting updated
          * @param  {string} newValue The string updated
          */
-        updateTime: function(oldValue, newValue) {
+        updateTime: function() {
             'use strict';
 
             this.mesure = this.time.split('/');
@@ -622,6 +628,7 @@
 
             console.log('Inserted : ' + this.inserted);
 
+            this.updateData();
             this.updateData(oldValue, newValue);
         },
 
@@ -961,6 +968,16 @@
             $('.editor').trigger(jQuery.Event('keyup'));
         },
 
+        changeSoloClassElement: function(element, selector, classInStake) {
+            'use strict';
+
+            $(this.shadowRoot.querySelectorAll(selector)).each(function() {
+                $(this).removeClass(classInStake);
+            });
+
+            element.classList.add(classInStake);
+        },
+
         /**
          * Adds the character in the textarea.
          * @param  {object} element The character clicked
@@ -971,7 +988,7 @@
             var $this = element.target;
             var character = $this.innerText;
 
-            this.async(this.updateKeydown($this));
+            this.async(this.changeSoloClassElement($this, '.keydown', 'keydown'));
 
             // Delete - erase
             if ($this.classList.contains('delete')) {
@@ -981,7 +998,13 @@
             } else if ($this.classList.contains('erase')) {
                 var str = this.note.trim();
                 if (this.inserted.length > 0) {
-                    var element = this.inserted.pop();
+                    var element = this.inserted.pop().trim();
+
+                    /*if (element.charAt(0) === ':') {
+                        this.duration = parseInt(element.substr(1, element.length - 1));
+
+                    }*/
+
                     this.note = str.substr(0, str.length - element.length);
                 }
                 return;
@@ -989,18 +1012,48 @@
 
             // Specific keyboard treatments
             if ($this.classList.contains('return')) {
-                this.note += '\n';
+                this.note += "\n";
                 character = '';
                 this.inserted.push('');
-            } else if ($this.classList.contains('hauteur')) {
+            }
+            else if ($this.classList.contains('hauteur')) {
                 character = '';
-                this.async(this.pitchClick($this));
-            } else if ($this.classList.contains('duration')) {
-                this.async(this.durationClick($this));
+                this.async(this.changeSoloClassElement($this, '.hauteur.active', 'active'));
+            }
+            else if ($this.classList.contains('duration')) {
                 character = this.durations[character] + ' ';
-            } else if ($this.classList.contains('note')) {
+                this.async(this.changeSoloClassElement($this, '.duration.active', 'active'));
+
+                var duration_str = character.trim().substr(1, character.length - 1);
+                this.duration = parseInt(duration_str);
+            }
+            else if ($this.classList.contains('note')) {
                 character = this.notesLangage['En'][this.notesLangage[this.language].indexOf(character)];
                 character += $(this.shadowRoot.querySelector('.hauteur.active')).html();
+
+                this.duree += (1 / this.duration);
+                console.log(this.duree);
+
+                var mesure = this.time.split('/');
+                var mesure_length = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
+
+                if (this.duree >= mesure_length) {
+                    this.inserted.push(character);
+                    this.note += character;
+                    this.duree = 0;
+                    this.nb_mesures += 1;
+
+                    if ((this.nb_mesures > 1) && (this.nb_mesures % 2 == 0)) {
+                        var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
+
+                        this.note += "\n\n";
+                        this.note += str + "\nnotes " + ':' + this.duration;
+
+                        character = '';
+                    } else {
+                        character = ' | ';
+                    }
+                }
             }
 
             // Add the character
@@ -1010,54 +1063,17 @@
             this.note += character;
         },
 
-        /*
-         * TODO: refactor
-         */
-        updateKeydown: function(element) {
-            'use strict';
-
-            $(this.shadowRoot.querySelectorAll('.keydown')).each(function() {
-                $(this).removeClass('keydown');
-            });
-
-            element.classList.add('keydown');
-        },
-
-        durationClick: function(element) {
-            'use strict';
-
-            $(this.shadowRoot.querySelectorAll('.duration.active')).each(function() {
-                $(this).removeClass('active');
-            });
-
-            element.classList.add('active');
-        },
-
-        pitchClick: function(element) {
-            'use strict';
-
-            $(this.shadowRoot.querySelectorAll('.hauteur.active')).each(function() {
-                $(this).removeClass('active');
-            });
-
-            element.classList.add('active');
-        },
-
-        /**
-         * Translates the keyboard.
-         * @param  {object} element
-         */
         translateLanguage: function(element) {
             'use strict';
 
             this.language = element.toElement.innerHTML;
 
-            if (this.language.length > 2) return; // To avoid the click between buttons.
+            if (this.language.length != 2) return; // To avoid the click between buttons.
 
-            if (this.language.toUpperCase() !== 'FR')
-                this.language === 'En';
+            if (this.language.toUpperCase() === 'FR')
+                this.language = 'Fr';
             else
-                this.language === 'Fr';
+                this.language = 'En';
 
             var polymer = this;
 

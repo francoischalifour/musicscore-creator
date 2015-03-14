@@ -1,4 +1,34 @@
 <div id="page-content">
     <h2>Home</h2>
     <p>Music Score Creator is a musical web application offering functionalities such as editing, visualizing and transposing music sheets.</p>
+
+    <h2>Catalog</h2>
+    <div id="catalog"></div>
+
+    <script>
+    (function() {
+        var catalogBox = $('#catalog');
+
+        /**
+         * Gets all sheets from the catalog.
+         * @param {string} File to load
+         * @return {objet} All sheets from the catalog
+         */
+        $.getJSON('catalog.json', function(data) {
+            var items = [];
+
+            $.each(data, function(key, sheet) {
+                /*sheet.contributors.forEach(function(contributor) {
+                    console.log(contributor.id);
+                });*/
+
+                items.push('<div class="card"><div class="card-header">' + sheet.title + '</div><p>Par ' + sheet.author + '</p><p>' + sheet.description + '</p></div>');
+            });
+
+            $('<div>', {
+                html: items.join('')
+            }).appendTo(catalogBox);
+        });
+    })();
+    </script>
 </div>
