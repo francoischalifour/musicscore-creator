@@ -804,27 +804,28 @@
          transHigher: function() {
             'use strict';
 
-            var sheet1 = $('.editor').val().split('notes');
-            var sheet = sheet1[1].split('');
             var polymer = this;
-            var tabNotes = polymer.findNotes(sheet);    // tableau contenant les notes
-            console.log('tabNotes = '+tabNotes);
+            var sheet1 = $('.editor').val().split('notes');
+            sheet1.forEach(function(sheetTab, nbIndex) {
+                if(nbIndex != 0) {
+                    var sheet = sheetTab.split('');
+                    var tabNotes = polymer.findNotes(sheet);    // tableau contenant les notes
 
-            tabNotes.forEach(function(note, indexNote) {
-                var notelc = note.toLowerCase();
+                    tabNotes.forEach(function(note, indexNote) {
+                        var notelc = note.toLowerCase();
 
-                var index = $.inArray(notelc, polymer.notes);
-                console.log('polymer.notes = '+polymer.notes);
-                var next = polymer.notes[(index + 1) % polymer.notes.length];
+                        var index = $.inArray(notelc, polymer.notes);
+                        var next = polymer.notes[(index + 1) % polymer.notes.length];
 
-                if (index !== -1) {
-                    var next = next.toUpperCase();
-                } else {
-                    var next = 'ERROR';
+                        if (index !== -1) {
+                            var next = next.toUpperCase();
+                        } else {
+                            var next = 'ERROR';
+                        }
+                       
+                        $('.editor').val(polymer.transpose(next, indexNote, nbIndex));
+                    });
                 }
-                console.log(note + ' -> ' + next);
-               
-                $('.editor').val(polymer.transpose(next, indexNote));
             });
 
             // Refresh the canvas.
@@ -834,27 +835,28 @@
          transLower: function() {
             'use strict';
 
-            var sheet1 = $('.editor').val().split('notes');
-            var sheet = sheet1[1].split('');
             var polymer = this;
-            var tabNotes = polymer.findNotes(sheet);    // tableau contenant les notes
-            console.log('tabNotes = '+tabNotes);
+            var sheet1 = $('.editor').val().split('notes');
+            sheet1.forEach(function(sheetTab, nbIndex) {
+                if(nbIndex != 0) {
+                    var sheet = sheetTab.split('');
+                    var tabNotes = polymer.findNotes(sheet);    // tableau contenant les notes
 
-            tabNotes.forEach(function(note, indexNote) {
-                var notelc = note.toLowerCase();
+                    tabNotes.forEach(function(note, indexNote) {
+                        var notelc = note.toLowerCase();
 
-                var index = $.inArray(notelc, polymer.notes);
-                console.log('polymer.notes = '+polymer.notes);
-                var prev = polymer.notes[(index - 1 + polymer.notes.length) % polymer.notes.length];
+                        var index = $.inArray(notelc, polymer.notes);
+                        var prev = polymer.notes[(index - 1 + polymer.notes.length) % polymer.notes.length];
 
-                if (index !== -1) {
-                    var prev = prev.toUpperCase();
-                } else {
-                    var prev = 'ERROR';
+                        if (index !== -1) {
+                            var prev = prev.toUpperCase();
+                        } else {
+                            var prev = 'ERROR';
+                        }
+
+                        $('.editor').val(polymer.transpose(prev, indexNote, nbIndex));
+                    });
                 }
-                console.log(note + ' -> ' + prev);
-
-                $('.editor').val(polymer.transpose(prev, indexNote));
             });
 
             // Refresh the canvas.
@@ -872,18 +874,20 @@
             var cptRes = 0;
             var noteVerif;
             var result = [];
+            var l_notes = true;
             sheet.forEach(function(note) {
                 //On cherche à savoir s'il s'agit d'une note de style "C#" ou "D#" par exemple
                 if (note.match('#')) {
                     noteVerif = sheet[cpt-1]+note;
                 } else if(sheet[cpt+1] == '#') {
                     noteVerif = 'no';
+                } else if(note == '\n' && l_notes) {
+                    l_notes = false;
                 } else {
                     noteVerif = note;
                 }
 
-                //transposition
-                if (noteVerif.match(/[a-g]#?b?/i)) {
+                if (noteVerif.match(/[a-g]#?b?/i) && l_notes) {
                     result[cptRes] = noteVerif;
                     cptRes++;
                 }
@@ -897,19 +901,26 @@
          * Transposes a note.
          * @param {string} note The note to transpose
          * @param {int} note index
+         * @param {int} sheet index
          * @return {string} string with the note transposed
          */
-         transpose: function(note, position) {
+         transpose: function(note, index, nbSheet) {
             'use strict';
 
             var textEdit = $('.editor').val();  //texte qui va remplacer celui du textarea
             var modif = false;                  // variable permettant de savoir si on peut procéder aux modifications
+            var position = index;
+            var p_sheet = nbSheet-1;
             
             for (var i = 0; i < textEdit.length; i++) {
                 if(i > 6 && !modif) {
                     var testif = textEdit.slice(i-6, i);
                     if(testif == '\nnotes') {
-                        modif = true;
+                        if(p_sheet == 0) {
+                            modif = true;
+                        } else {
+                            p_sheet--;
+                        }
                     }
                 }
 
