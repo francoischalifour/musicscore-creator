@@ -806,6 +806,36 @@
          * @param  {string} note The note to transpose
          * @return {string} the note higher
          */
+         /*transHigher: function() {
+            'use strict';
+
+            var sheet1 = $('.editor').val().split('notes');
+            var sheet = sheet1[1].split('');
+            var polymer = this;
+            var tabNotes = polymer.transpose(sheet);
+            console.log(tabNotes);
+
+            tabNotes.forEach(function(note) {
+                var notelc = note.toLowerCase();
+
+                var index = $.inArray(notelc, polymer.notes);
+                console.log(polymer.notes);
+                var next = polymer.notes[($.inArray(notelc, polymer.notes) + 1) % polymer.notes.length];
+                console.log(note + ' -> ' + next);
+
+                if (index !== -1) {
+                    var next = next.toUpperCase();
+                } else {
+                    var next = 'ERROR';
+                }
+
+                var reg = new RegExp(next, "g");
+                $('.editor').val($('.editor').val().replace(reg, next));
+            });
+
+            // Refresh the canvas.
+            $('.editor').trigger(jQuery.Event('keyup'));
+         },*/
         transHigher: function(note) {
             'use strict';
 
@@ -813,6 +843,7 @@
 
             var index = $.inArray(note, this.notes);
             var next = this.notes[($.inArray(note, this.notes) + 1) % this.notes.length];
+            console.log(note + ' -> ' + next.toUpperCase());
 
             if (index !== -1) {
                 return next.toUpperCase();
@@ -826,7 +857,35 @@
          * @param  {string} note The note to transpose
          * @return {string} the note lower
          */
-        transLower: function(note) {
+         transLower: function() {
+            'use strict';
+
+            var sheet1 = $('.editor').val().split('notes');
+            var sheet = sheet1[1].split('');
+            var polymer = this;
+            var tabNotes = polymer.transpose(sheet);
+
+            tabNotes.forEach(function(note) {
+                var notelc = note.toLowerCase();
+
+                var index = $.inArray(notelc, this.notes);
+                var prev = this.notes[($.inArray(notelc, this.notes) - 1 + this.notes.length) % this.notes.length];
+                console.log(note + ' -> ' + prev);
+
+                if (index !== -1) {
+                    var prev = prev.toUpperCase();
+                } else {
+                    var prev = 'ERROR';
+                }
+
+                var reg = new RegExp(prev, "g");
+                $('.editor').val($('.editor').val().replace(reg, prev));
+            });
+
+            // Refresh the canvas.
+            $('.editor').trigger(jQuery.Event('keyup'));
+         },
+        /*transLower: function(note) {
             'use strict';
 
             var note = note.toLowerCase();
@@ -839,12 +898,37 @@
             } else {
                 return 'ERROR';
             }
-        },
+        },*/
 
         /**
          * Replaces all notes to transpose.
          * @param {string} type Higher or Lower
          */
+         /*transpose: function(sheet) {
+            'use strict';
+
+            var cpt = 0;
+            var noteVerif;
+            var result = [];
+            var cptRes = 0;
+            sheet.forEach(function(note) {
+                //On cherche à savoir s'il s'agit d'une note de style "C#" ou "D#" par exemple
+                if (note.match('#')) {
+                    noteVerif = sheet[cpt-1]+note;
+                } else {
+                    noteVerif = note
+                }
+
+                //transposition
+                if (noteVerif.match(/[a-g]#?b?/i)) {
+                    result[cptRes] = noteVerif;
+                    cptRes++;
+                }
+                cpt++;
+            });
+
+            return result;
+         },*/
         transpose: function() {
             'use strict';
 
@@ -853,11 +937,24 @@
 
             var polymer = this;
 
+            var cpt = 0;
+            var noteVerif;
             sheet.forEach(function(note) {
-                if (note.match(/[a-g]#?b?/i)) {
-                    var reg = new RegExp(note, "g");
-                    $('.editor').val($('.editor').val().replace(reg, polymer.transHigher(note)));
+                //On cherche à savoir s'il s'agit d'une note de style "C#" ou "D#" par exemple
+                if (note.match('#')) {
+                    noteVerif = sheet[cpt-1]+note;
+                } else if(sheet[cpt+1] == '#') {
+                    noteVerif = 'no';
+                } else {
+                    noteVerif = note;
                 }
+
+                //transposition
+                if (noteVerif.match(/[a-g]#?b?/i)) {
+                    var reg = new RegExp(noteVerif, "g");
+                    $('.editor').val($('.editor').val().replace(reg, polymer.transHigher(noteVerif)));
+                }
+                cpt++;
             });
 
             // Refresh the canvas.
