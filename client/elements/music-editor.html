@@ -588,7 +588,7 @@
 
             this.mesure = this.time.split('/');
 
-            console.log('Inserted : ' + this.inserted);
+            /* console.log('Inserted : ' + this.inserted);
 
             if (this.mesure.length === 2 && this.mesure[1].length > 0) {
                 var final_notes = '';
@@ -626,10 +626,9 @@
                 this.note = final_notes;
             }
 
-            console.log('Inserted : ' + this.inserted);
+            console.log('Inserted : ' + this.inserted);*/
 
             this.updateData();
-            this.updateData(oldValue, newValue);
         },
 
         /**
@@ -683,60 +682,50 @@
          */
         sendSheet: function() {
             'use strict';
-
             // Abort if there is no recipient.
             if (!this.destinataire) {
                 this.shadowRoot.querySelector('#toastNoRecip').show();
                 return;
             }
-
             this.shadowRoot.querySelector('#toastSending').show();
-
             var username = 'A user';
             var songtitle = this.songtitle || 'Music sheet';
-
+            if (!this.description)
+                var description = '';
+            else
+                var description = '<div style="min-height:16px"></div><div style="font-size:14px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell;">' + this.description.replace(/\n/g, "<br>") + '<div></div></span></div></div>';
+            if (!$('.editor').val())
+                var sheetContent = '';
+            else
+                var sheetContent = '<div style="min-height:16px"></div><div style="font-size:14px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell;"><pre style="background-color: #f7f7f7;border-radius:2px;padding:6px"><code>' + $('.editor').val() + '</code></pre><div></div></span></div></div>';
             if (!this.message)
                 var message = '';
             else
                 var message = '<div style="min-height:16px"></div><div style="min-height:1px;background-color:#eee"></div><div style="min-height:24px"></div><div style="display:table-row"><img style="display:table-cell" width="50" src="https://ci6.googleusercontent.com/proxy/s-yPWoeSrlt6ZaoEP0RnkHoJeHLVeSoqJqjDYitG58eUv3D1-OW-h7BVqADdvJRBzR92d16tqhuflDKOtJsB3Zn_ZHZKoZOqYZC_Q1gOYVOp=s0-d-e1-ft#https://ssl.gstatic.com/s2/profiles/images/silhouette64.png" alt=""><span style="display:table-cell;vertical-align:top;padding-left:16px;font-size:13px;line-height:18px;max-width:496px;color:#262626">' + this.message.replace(/\n/g, "<br>")  + '</span></div>';
-
-            if (!this.description)
-                var description = '';
-            else
-                var description = '<div style="min-height:16px"></div><div style="font-size:14px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell;">' + this.description.replace(/\n/g, "<br>")+ '<div></div></span></div></div>';
-
             // Prepare the music sheet converted to PDF.
             this.canvas = document.querySelector('.vex-canvas');
             this.context = this.canvas.getContext('2d');
-
             // Fill the background with white.
             this.context.globalCompositeOperation = 'destination-over';
             this.context.fillStyle = '#fff';
             this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
             // Convert to image and give a filename.
             this.img = this.canvas.toDataURL('image/jpeg', 1.0);
             this.filename = this.songtitle || 'musicscore';
-
             // Create the PDF.
             this.pdf = jsPDF();
-
             // Create music sheet information.
             this.pdf.setFontSize(22);
             this.pdf.text(25, 25, this.songtitle);
             this.pdf.setFontSize(12);
             this.pdf.setTextColor(150);
             this.pdf.text(25, 32, 'Written with MusicScore Creator');
-
             // Add the information to the PDF.
             this.pdf.addImage(this.img, 'JPEG', 24, 40);
-
             // To attach the PDF.
             this.pdfBase64 = this.pdf.output('datauristring').split(',')[1];
-
             // Stock the pointer to use in the Ajax element.
             var polymer = this;
-
             $.ajax({
                 type: 'POST',
                 url: 'https://mandrillapp.com/api/1.0/messages/send.json',
@@ -756,7 +745,7 @@
                         }],
                         'autotext': 'true',
                         'subject': 'MusicScore Creator - You received a music sheet',
-                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title><div><div style="width:100%;padding:24px 0 16px 0;background-color:#f5f5f5;text-align:center"><div style="display:inline-block;width:90%;max-width:680px;min-width:280px;text-align:left;font-family:Roboto,Arial,Helvetica,sans-serif"><div style="display:block;padding:0 2px"><div style="display:block;background:#fff;min-height:2px"></div></div><div style="border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0"><div style="padding:24px 32px 32px 32px;background:#fff;border-right:1px solid #eaeaea;border-left:1px solid #eaeaea" dir="ltr"><div style="font-size:14px;line-height:18px;color:#444"><a href="mailto:michel@lesecuriesdeventadour.com" style="color:inherit;text-decoration:none" target="_blank">' + username + '</a> <b>shared</b> a music sheet with you.</div><div style="min-height:24px"></div><div style="font-size:18px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle" target="_blank">' + songtitle + '</a><div></div></span></div></div>' + description + message + '<div style="min-height:32px"></div><div><a href="https://github.com/francoischalifour/musicscore-creator" style="background-color:#263238;border:1px solid #263238;border-radius:2px;color:#fff;display:inline-block;font-family:Arial;font-size:11px;font-weight:700;min-height:29px;line-height:29px;min-width:54px;outline:0;padding:0 8px;text-align:center;text-decoration:none" target="_blank">Go to MusicScore Creator</a></div></div></div><table style="width:100%;border-collapse:collapse"><tr><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#e5e5e5" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><tr height="1"><td width="1" bgcolor="#f5f5f5" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"></table><td style="width:100%;padding:0"><div style="min-height:1px;width:auto;border-top:1px solid #ddd;background:#eaeaea;border-bottom:1px solid #f0f0f0"></div><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#e5e5e5" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f5f5f5" style="padding:0"></table></table><table style="padding:14px 10px 0 10px" dir="ltr"><tr><td style="width:100%;font-size:11px;font-family:Open Sans,Arial;color:#646464;line-height:20px;min-height:40px;vertical-align:middle">Find all your musical sheets on <a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle">MusicScore Creator</a>.<td style="padding-left:20px;vertical-align:middle"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#888;text-decoration:none;vertical-align:middle" target="_blank">MusicScore Creator</a></table></div></div></div></body></html>'
+                        'html': '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head> <meta name="viewport" content="width=device-width"/> <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/> <title>MusicScore Creator</title><div><div style="width:100%;padding:24px 0 16px 0;background-color:#f5f5f5;text-align:center"><div style="display:inline-block;width:90%;max-width:680px;min-width:280px;text-align:left;font-family:Roboto,Arial,Helvetica,sans-serif"><div style="display:block;padding:0 2px"><div style="display:block;background:#fff;min-height:2px"></div></div><div style="border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0"><div style="padding:24px 32px 32px 32px;background:#fff;border-right:1px solid #eaeaea;border-left:1px solid #eaeaea" dir="ltr"><div style="font-size:14px;line-height:18px;color:#444"><a href="mailto:michel@lesecuriesdeventadour.com" style="color:inherit;text-decoration:none" target="_blank">' + username + '</a> <b>shared</b> a music sheet with you.</div><div style="min-height:24px"></div><div style="font-size:18px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle" target="_blank">' + songtitle + '</a><div></div></span></div></div>' + description + sheetContent + message + '<div style="min-height:32px"></div><div><a href="https://github.com/francoischalifour/musicscore-creator" style="background-color:#263238;border:1px solid #263238;border-radius:2px;color:#fff;display:inline-block;font-family:Arial;font-size:11px;font-weight:700;min-height:29px;line-height:29px;min-width:54px;outline:0;padding:0 8px;text-align:center;text-decoration:none" target="_blank">Go to MusicScore Creator</a></div></div></div><table style="width:100%;border-collapse:collapse"><tr><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#e5e5e5" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><tr height="1"><td width="1" bgcolor="#f5f5f5" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"></table><td style="width:100%;padding:0"><div style="min-height:1px;width:auto;border-top:1px solid #ddd;background:#eaeaea;border-bottom:1px solid #f0f0f0"></div><td style="padding:0"><table style="border-collapse:collapse;width:3px"><tr height="1"><td width="1" bgcolor="#e5e5e5" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#eaeaea" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><tr height="1"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f0f0f0" style="padding:0"><td width="1" bgcolor="#f5f5f5" style="padding:0"></table></table><table style="padding:14px 10px 0 10px" dir="ltr"><tr><td style="width:100%;font-size:11px;font-family:Open Sans,Arial;color:#646464;line-height:20px;min-height:40px;vertical-align:middle">Find all your musical sheets on <a href="https://github.com/francoischalifour/musicscore-creator" style="color:#263238;text-decoration:none;vertical-align:middle">MusicScore Creator</a>.<td style="padding-left:20px;vertical-align:middle"><a href="https://github.com/francoischalifour/musicscore-creator" style="color:#888;text-decoration:none;vertical-align:middle" target="_blank">MusicScore Creator</a></table></div></div></div></body></html>'
                     }
                 }
             }).done(function() {
