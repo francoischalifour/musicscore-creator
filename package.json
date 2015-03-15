@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "express": "~4.9.0",
+    "fs": "0.0.2",
+    "lodash": "^3.5.0",
     "vextab": "^2.0.10"
   }
 }

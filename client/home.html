@@ -7,6 +7,8 @@
 
     <script>
     (function() {
+        'use strict';
+
         var catalogBox = $('#catalog');
 
         /**
@@ -14,20 +16,24 @@
          * @param {string} File to load
          * @return {objet} All sheets from the catalog
          */
-        $.getJSON('catalog.json', function(data) {
-            var items = [];
+        $.ajax({
+            type: 'GET',
+            url: '/catalog',
+            dataType: 'json',
+            success: function(sheets) {
+                var items = [];
 
-            $.each(data, function(key, sheet) {
-                /*sheet.contributors.forEach(function(contributor) {
-                    console.log(contributor.id);
-                });*/
+                for (var key in sheets) {
+                    items.push('<div class="card"><div class="card-header">' + sheets[key].title + '</div><p>Par ' + sheets[key].author + ' ' + sheets[key].username+ '</p><p>' + sheets[key].description + '</p></div>');
+                }
 
-                items.push('<div class="card"><div class="card-header">' + sheet.title + '</div><p>Par ' + sheet.author + '</p><p>' + sheet.description + '</p></div>');
-            });
-
-            $('<div>', {
-                html: items.join('')
-            }).appendTo(catalogBox);
+                $('<div>', {
+                    html: items.join('')
+                }).appendTo(catalogBox);
+            },
+            error: function(err) {
+                console.log('An error has occured');
+            }
         });
     })();
     </script>

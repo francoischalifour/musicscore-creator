@@ -23,6 +23,12 @@ var http = require('http');
  */
 var path = require('path');
 
+/**
+ * Imports Lodash library.
+ * @type {object}
+ */
+var _ = require('lodash');
+
 /*
  * Loads internal dependencies.
  */
@@ -58,6 +64,36 @@ app.use(function(req, res, next) {
 
     // Pass to next layer of middleware
     next();
+});
+
+/**
+ * Gets all users.
+ * @param  {object} req
+ * @param  {object} res
+ */
+app.get('/users', function(req, res) {
+    res.json(require('../client/users.json'));
+});
+
+/**
+ * Gets all sheets.
+ * @param  {object} req
+ * @param  {object} res
+ */
+app.get('/sheets', function(req, res) {
+    res.json(require('../client/catalog.json'));
+});
+
+/**
+ * Gets all users and sheets.
+ * @param  {object} req
+ * @param  {object} res
+ */
+app.get('/catalog', function(req, res) {
+    var users = require('../client/users.json');
+    var sheets = require('../client/catalog.json');
+
+    res.json(_.merge(users, sheets));
 });
 
 /*

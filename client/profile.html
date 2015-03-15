@@ -40,14 +40,14 @@
                     url: '/users.json',
                     dataType: 'json',
                     success: function(users) {
-                        users.forEach(function(user) {
-                            if (user.username === username && user.password  === password) {
-                                $('#login').html('Connecté en tant que ' + user.username);
-                                $('#login').append(' (' + user.credits + ' crédits)');
+                        for (var key in users) {
+                            if (users[key].username === username && users[key].password  === password) {
+                                $('#login').html('Connecté en tant que ' + users[key].username);
+                                $('#login').append(' (' + users[key].credits + ' crédits)');
                                 $(location).attr('href', '#home');
                                 return;
                             }
-                        });
+                        }
                     },
                     error: function(err) {
                         document.getElementById('toastError').show();
