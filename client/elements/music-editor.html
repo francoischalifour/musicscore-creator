@@ -562,8 +562,6 @@
 
         /**
          * Updates music score.
-         * @param  {string} oldValue The string that defines the music score before getting updated
-         * @param  {string} newValue The string updated
          */
         updateData: function() {
             'use strict';
@@ -571,7 +569,7 @@
             var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
 
             if (this.note.trim().length !== 0) {
-                str += "\nnotes " + this.note;
+                str += "\nnotes " + this.note + " =|= ";
             }
 
             $('.editor').val(str);
@@ -580,8 +578,6 @@
 
         /**
          * Updates and corrects bars to match the time signature.
-         * @param  {string} oldValue The string that defines the music score before getting updated
-         * @param  {string} newValue The string updated
          */
         updateTime: function() {
             'use strict';
@@ -822,7 +818,7 @@
                         } else {
                             var next = 'ERROR';
                         }
-                       
+
                         $('.editor').val(polymer.transpose(next, indexNote, nbIndex));
                     });
                 }
@@ -911,7 +907,7 @@
             var modif = false;                  // variable permettant de savoir si on peut procéder aux modifications
             var position = index;
             var p_sheet = nbSheet-1;
-            
+
             for (var i = 0; i < textEdit.length; i++) {
                 if(i > 6 && !modif) {
                     var testif = textEdit.slice(i-6, i);
@@ -958,69 +954,83 @@
         keyboardClick: function(element) {
             'use strict';
 
-            var $this = element.target;
-            var character = $this.innerText;
-
-            this.async(this.changeSoloClassElement($this, '.keydown', 'keydown'));
+            var tapped = element.target;
+            this.async(this.changeSoloClassElement(tapped, '.keydown', 'keydown'));
 
             // Delete - erase
-            if ($this.classList.contains('delete')) {
+            if (tapped.classList.contains('delete')) {
                 this.inserted = [];
                 this.note = '';
+                this.duree = 0;
+                this.nb_mesures = 0;
                 return;
-            } else if ($this.classList.contains('erase')) {
+            }
+
+            if (tapped.classList.contains('erase')) {
                 var str = this.note.trim();
                 if (this.inserted.length > 0) {
                     var element = this.inserted.pop().trim();
 
-                    /*if (element.charAt(0) === ':') {
-                        this.duration = parseInt(element.substr(1, element.length - 1));
+                    if (element.indexOf('tabstave') > -1) {
+                        var mesure = this.time.split('/');
+                        this.duree = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
+                        this.nb_mesures -= 1
+                    }
 
-                    }*/
-
-                    this.note = str.substr(0, str.length - element.length);
+                    this.note = str.substr(0, str.length - element.length).trim();
                 }
                 return;
             }
 
             // Specific keyboard treatments
-            if ($this.classList.contains('return')) {
+            var character = tapped.innerText;
+
+            if (tapped.classList.contains('return')) {
                 this.note += "\n";
                 character = '';
                 this.inserted.push('');
             }
-            else if ($this.classList.contains('hauteur')) {
+            else if (tapped.classList.contains('hauteur')) {
                 character = '';
-                this.async(this.changeSoloClassElement($this, '.hauteur.active', 'active'));
+                this.async(this.changeSoloClassElement(tapped, '.hauteur.active', 'active'));
             }
-            else if ($this.classList.contains('duration')) {
+            else if (tapped.classList.contains('duration')) {
                 character = this.durations[character] + ' ';
-                this.async(this.changeSoloClassElement($this, '.duration.active', 'active'));
+                this.async(this.changeSoloClassElement(tapped, '.duration.active', 'active'));
 
                 var duration_str = character.trim().substr(1, character.length - 1);
                 this.duration = parseInt(duration_str);
             }
-            else if ($this.classList.contains('note')) {
+            else if (tapped.classList.contains('note')) {
                 character = this.notesLangage['En'][this.notesLangage[this.language].indexOf(character)];
                 character += $(this.shadowRoot.querySelector('.hauteur.active')).html();
 
                 this.duree += (1 / this.duration);
-                console.log(this.duree);
 
                 var mesure = this.time.split('/');
                 var mesure_length = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
 
                 if (this.duree >= mesure_length) {
-                    this.inserted.push(character);
-                    this.note += character;
+                    var insert_before = (this.duree == mesure_length);
+                    if (insert_before) {
+                        this.inserted.push(character);
+                        this.note += character;
+                    }
+
                     this.duree = 0;
                     this.nb_mesures += 1;
 
                     if ((this.nb_mesures > 1) && (this.nb_mesures % 2 == 0)) {
                         var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
 
-                        this.note += "\n\n";
-                        this.note += str + "\nnotes " + ':' + this.duration;
+                        var str = "\n\n" + str + "\nnotes " + ':' + this.duration;
+                        this.inserted.push(str);
+                        this.note += str;
+
+                        if (!insert_before) {
+                            this.inserted.push(character);
+                            this.note += character;
+                        }
 
                         character = '';
                     } else {
