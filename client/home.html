@@ -3,38 +3,5 @@
     <p>Music Score Creator is a musical web application offering functionalities such as editing, visualizing and transposing music sheets.</p>
 
     <h2>Catalog</h2>
-    <div id="catalog"></div>
-
-    <script>
-    (function() {
-        'use strict';
-
-        var catalogBox = $('#catalog');
-
-        /**
-         * Gets all sheets from the catalog.
-         * @param {string} File to load
-         * @return {objet} All sheets from the catalog
-         */
-        $.ajax({
-            type: 'GET',
-            url: '/catalog',
-            dataType: 'json',
-            success: function(sheets) {
-                var items = [];
-
-                for (var key in sheets) {
-                    items.push('<div class="card"><div class="card-header">' + sheets[key].title + '</div><p>Par ' + sheets[key].author + ' ' + sheets[key].username+ '</p><p>' + sheets[key].description + '</p></div>');
-                }
-
-                $('<div>', {
-                    html: items.join('')
-                }).appendTo(catalogBox);
-            },
-            error: function(err) {
-                console.log('An error has occured');
-            }
-        });
-    })();
-    </script>
+    <music-catalog></music-catalog>
 </div>

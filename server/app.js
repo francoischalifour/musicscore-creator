@@ -90,10 +90,27 @@ app.get('/sheets', function(req, res) {
  * @param  {object} res
  */
 app.get('/catalog', function(req, res) {
-    var users = require('../client/users.json');
-    var sheets = require('../client/catalog.json');
+    var _users = require('../client/users.json');
+    var _sheets = require('../client/catalog.json');
 
-    res.json(_.merge(users, sheets));
+    var users = _.clone(_users, true);
+    var sheets = _.clone(_sheets, true);
+
+    _.keys(sheets).forEach(function(sid) {
+        var sheet = sheets[sid];
+        sheet.author = users[sheet.author];
+        delete sheet.author.password;
+
+        if (sheet.contributors) {
+            var contributors = sheet.contributors;
+            contributors.forEach(function(contrib, index) {
+                contributors[index] = users[contrib.id];
+                delete contributors[index].password;
+            });
+        }
+    });
+
+    res.json(sheets);
 });
 
 /*
