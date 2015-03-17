@@ -32,21 +32,31 @@
              */
             $('#connexion').on('click', function(e) {
                 e.preventDefault();
-                var username = $('#username').val();
-                var password = $('#password').val();
+
+                var objet = {
+                    login: $('#username').val(),
+                    password: $('#password').val()
+                }
 
                 $.ajax({
+                    data: objet,
+                    dataType: 'jsonp',
                     type: 'GET',
-                    url: '/users.json',
-                    dataType: 'json',
-                    success: function(users) {
-                        for (var key in users) {
-                            if (users[key].username === username && users[key].password  === password) {
-                                $('#login').html('Connecté en tant que ' + users[key].username);
-                                $('#login').append(' (' + users[key].credits + ' crédits)');
-                                $(location).attr('href', '#home');
-                                return;
-                            }
+                    crossDomain : true,
+                    url: 'http://164.81.20.57/gestion_js/php/checkPassword.php',
+                    headers: {
+                        "Access-Control-Allow-Origin": 'http://164.81.20.57:3030',
+                        "Access-Control-Allow-Methods": 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+                        'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+                        'Access-Control-Allow-Credentials': true
+                    },
+                    success: function(user) {
+                        if (user) {
+                            $('#login').html('Connecté en tant que ' + user.login);
+                            $('#login').append(' (' + user.nbCredit + ' crédits)');
+                            $(location).attr('href', '#home');
+                        } else {
+                            console.log('Erreur d\'authentification');
                         }
                     },
                     error: function(err) {

@@ -24,9 +24,15 @@
             font-size: 1.3em;
             color: #263238;
         }
+        .card-subheader {
+            font-size: 1.1em;
+            color: #999;
+        }
         </style>
 
         <div id="catalog"></div>
+
+        <paper-toast text="Erreur de requête" id="toastError"></paper-toast>
 
     </template>
 
@@ -50,7 +56,19 @@
                     var items = [];
 
                     for (var key in sheets) {
-                        items.push('<div class="card"><div class="card-header">' + sheets[key].title + '</div><p>Par ' + sheets[key].author.username + '</p><p>' + sheets[key].description + '</p></div>');
+                        items.push('<div class="card">\
+                            <div class="card-header" horizontal start-justified layout>' + sheets[key].title + '</div>\
+                            <div horizontal end-justified layout>\
+                                <paper-button class="seeSheet" raised>See</paper-button>\
+                                <paper-button class="buySheet" raised>Buy</paper-button>\
+                            </div>\
+                            <div class="card-subheader" horizontal start-justified layout>Par ' + sheets[key].author.username + '</div>\
+                            <p>' + sheets[key].description + '</p>\
+                            <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="seeSheet' + key + '" heading="' + sheets[key].title + '">\
+                                <div class="vex-tabdiv" width="600" scale="1.0" editor="false" height="100">' + sheets[key].content + '</div>\
+                                <paper-button affirmative>Close</paper-button>\
+                            </paper-action-dialog>\
+                        </div>');
                     }
 
                     $('<div>', {
@@ -60,6 +78,69 @@
                 error: function(err) {
                     console.log('An error has occured');
                 }
+            });
+
+            /**
+             * Debits an account.
+             * @param {string} File to load
+             * @return {objet} All sheets from the catalog
+             */
+            function buySheet() {
+                var objet = {
+                    id: idCompte,
+                    montant: montant
+                }
+
+                $.ajax({
+                    data: objet,
+                    type: 'GET',
+                    url: 'http://164.81.20.57/gestion_js/php/debiter.php',
+                    success: function(err) {
+                        if (err) {
+                            console.log('Erreur de débit:' + err);
+                        } else {
+                            console.log('Traitement');
+                        }
+                    },
+                    error: function(err) {
+                        document.getElementById('toastError').show();
+                    }
+                });
+            }
+
+            /**
+             * Gets credit by pseudo.
+             * @param  {string} File to load
+             * @return {number} Number of credits
+             */
+            function getCreditByPseudo() {
+                var objet = {
+                    pseudo: pseudo
+                }
+
+                $.ajax({
+                    data: objet,
+                    type: 'GET',
+                    url: 'http://164.81.20.57/gestion_js/php/get_credit_by_pseudo.php',
+                    success: function(credits) {
+                        if (credits !== -1) {
+                            console.log('Nombre de crédits : ' + credits)
+                        } else {
+                            console.log('Erreur de get crédit : pseudo inexistant, ou erreur de fichier serveur');
+                        }
+                    },
+                    error: function(err) {
+                        document.getElementById('toastError').show();
+                    }
+                });
+            }
+
+            /**
+             * Displays a sheet.
+             */
+            $('.seeSheet').on('click', function(key) {
+                console.log('Aperçu partition');
+                $('#seeSheet' + key).toggle();
             });
         }
     });

@@ -407,9 +407,6 @@
             this.key = 'C';
             this.tuning = 'standard';
 
-            this.note = '';
-            this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
-
             this.language = 'En';
             this.notesLangage = {
                 'Fr': ['La', 'Si', 'Do', 'Ré', 'Mi', 'Fa', 'Sol'],
@@ -432,6 +429,9 @@
                 '𝅘𝅥𝅱': ':64',
                 '𝅘𝅥𝅲': ':128',
             }
+
+            this.note = ':' + this.duration + ' ';
+            this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
 
             this.clefs = [{
                 'name': 'Treble',
@@ -804,7 +804,6 @@
                 if(nbIndex != 0) {
                     var sheet = sheetTab.split('');
                     var tabNotes = polymer.findNotes(sheet);    // tableau contenant les notes
-
                     tabNotes.forEach(function(note, indexNote) {
                         var notelc = note.toLowerCase();
 
@@ -873,9 +872,9 @@
                 //On cherche à savoir s'il s'agit d'une note de style "C#" ou "D#" par exemple
                 if (note.match('#')) {
                     noteVerif = sheet[cpt-1]+note;
-                } else if(sheet[cpt+1] == '#') {
+                } else if(sheet[cpt+1] == '#') { //Est-ce qu'on s'est déjà occupé de cette note ?
                     noteVerif = 'no';
-                } else if(note == '\n' && l_notes) {
+                } else if(note == '\n' && l_notes) { // Est'ce que l'on est sur la ligne "notes: (...)"
                     l_notes = false;
                 } else {
                     noteVerif = note;
@@ -922,7 +921,7 @@
                     if(position != 0){
                         position--;
                     } else {
-                        if(textEdit[i+1] != '#'){
+                        if(textEdit[i+1] != '#' && textEdit[i+1] != 'n'){
                             textEdit = textEdit.slice(0, i) + note + textEdit.slice(i+1);
                          } else {
                             textEdit = textEdit.slice(0, i) + note + textEdit.slice(i+2);
@@ -965,14 +964,31 @@
             }
 
             if (tapped.classList.contains('erase')) {
-                var str = this.note.trim();
+                var str = this.note;
                 if (this.inserted.length > 0) {
-                    var element = this.inserted.pop().trim();
+                    var element = this.inserted.pop();
 
                     if (element.indexOf('tabstave') > -1) {
                         var mesure = this.time.split('/');
                         this.duree = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
                         this.nb_mesures -= 1
+                    } else if (element.indexOf('/') > -1) {
+                        this.duree -= (1 / this.duration);
+                        if (this.duree <= 0) {
+                            var mesure = this.time.split('/');
+                            var mesure_length = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
+                            this.duree = mesure_length;
+                            this.nb_mesures -= 1;
+
+                            element = element.concat(this.inserted.pop());
+                        }
+                    } else if (element.indexOf(':') > -1) {
+                        for (var i = this.inserted.length - 1; i >= 0; i--) {
+                            if (this.inserted[i].indexOf(':') > -1) {
+                                this.duration = parseInt(this.inserted[i].substr(1, this.inserted[i].length - 1));
+                                break;
+                            }
+                        };
                     }
 
                     this.note = str.substr(0, str.length - element.length).trim();
@@ -1008,31 +1024,25 @@
                 var mesure = this.time.split('/');
                 var mesure_length = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
 
-                if (this.duree >= mesure_length) {
-                    var insert_before = (this.duree == mesure_length);
-                    if (insert_before) {
-                        this.inserted.push(character);
-                        this.note += character;
-                    }
-
-                    this.duree = 0;
+                if (this.duree > mesure_length) {
                     this.nb_mesures += 1;
 
                     if ((this.nb_mesures > 1) && (this.nb_mesures % 2 == 0)) {
                         var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
 
-                        var str = "\n\n" + str + "\nnotes " + ':' + this.duration;
+                        var str = "\n\n" + str + "\nnotes " + ':' + this.duration + ' ';
                         this.inserted.push(str);
                         this.note += str;
 
-                        if (!insert_before) {
-                            this.inserted.push(character);
-                            this.note += character;
-                        }
+                        this.inserted.push(character);
+                        this.note += character;
 
+                        this.duree = 0 + (this.duree - mesure_length);
                         character = '';
                     } else {
-                        character = ' | ';
+                        this.duree = (1 / this.duration);
+                        this.inserted.push(' | ');
+                        this.note += ' | ';
                     }
                 }
             }
