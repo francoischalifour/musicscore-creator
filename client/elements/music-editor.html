@@ -806,7 +806,6 @@
                 if(nbIndex != 0) {
                     var sheet = sheetTab.split('');
                     var tabNotes = polymer.findNotes(sheet);    // tableau contenant les notes
-
                     tabNotes.forEach(function(note, indexNote) {
                         var notelc = note.toLowerCase();
 
@@ -875,9 +874,9 @@
                 //On cherche à savoir s'il s'agit d'une note de style "C#" ou "D#" par exemple
                 if (note.match('#')) {
                     noteVerif = sheet[cpt-1]+note;
-                } else if(sheet[cpt+1] == '#') {
+                } else if(sheet[cpt+1] == '#') { //Est-ce qu'on s'est déjà occupé de cette note ?
                     noteVerif = 'no';
-                } else if(note == '\n' && l_notes) {
+                } else if(note == '\n' && l_notes) { // Est'ce que l'on est sur la ligne "notes: (...)"
                     l_notes = false;
                 } else {
                     noteVerif = note;
@@ -924,7 +923,7 @@
                     if(position != 0){
                         position--;
                     } else {
-                        if(textEdit[i+1] != '#'){
+                        if(textEdit[i+1] != '#' && textEdit[i+1] != 'n'){
                             textEdit = textEdit.slice(0, i) + note + textEdit.slice(i+1);
                          } else {
                             textEdit = textEdit.slice(0, i) + note + textEdit.slice(i+2);
