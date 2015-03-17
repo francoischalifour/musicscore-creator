@@ -32,6 +32,8 @@
 
         <div id="catalog"></div>
 
+        <paper-toast text="Erreur de requête" id="toastError"></paper-toast>
+
     </template>
 
     <script>
@@ -62,7 +64,7 @@
                             </div>\
                             <div class="card-subheader" horizontal start-justified layout>Par ' + sheets[key].author.username + '</div>\
                             <p>' + sheets[key].description + '</p>\
-                            <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="seeSheet' + sheets[key] + '" heading="' + sheets[key].title + '">\
+                            <paper-action-dialog backdrop layered="false" transition="core-transition-center" id="seeSheet' + key + '" heading="' + sheets[key].title + '">\
                                 <div class="vex-tabdiv" width="600" scale="1.0" editor="false" height="100">' + sheets[key].content + '</div>\
                                 <paper-button affirmative>Close</paper-button>\
                             </paper-action-dialog>\
@@ -92,7 +94,7 @@
                 $.ajax({
                     data: objet,
                     type: 'GET',
-                    url: '192.164.20.1/debiter.php',
+                    url: 'http://164.81.20.57/gestion_js/php/debiter.php',
                     success: function(err) {
                         if (err) {
                             console.log('Erreur de débit:' + err);
@@ -119,11 +121,10 @@
                 $.ajax({
                     data: objet,
                     type: 'GET',
-                    url: '192.164.20.1/get_credit_by_pseudo.php',
-                    success: function(nomber) {
-                        if (nomber !== -1) {
-                            // traitement
-                            console.log('Traitement');
+                    url: 'http://164.81.20.57/gestion_js/php/get_credit_by_pseudo.php',
+                    success: function(credits) {
+                        if (credits !== -1) {
+                            console.log('Nombre de crédits : ' + credits)
                         } else {
                             console.log('Erreur de get crédit : pseudo inexistant, ou erreur de fichier serveur');
                         }
@@ -137,9 +138,9 @@
             /**
              * Displays a sheet.
              */
-            $('.seeSheet').on('click', function() {
+            $('.seeSheet').on('click', function(key) {
                 console.log('Aperçu partition');
-                $('#seeSheet' + sheets[key]).toggle();
+                $('#seeSheet' + key).toggle();
             });
         }
     });
