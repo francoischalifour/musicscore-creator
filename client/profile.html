@@ -32,21 +32,23 @@
              */
             $('#connexion').on('click', function(e) {
                 e.preventDefault();
-                var username = $('#username').val();
-                var password = $('#password').val();
+
+                var objet = {
+                    login: $('#username').val(),
+                    password: $('#password').val()
+                }
 
                 $.ajax({
+                    data: objet,
                     type: 'GET',
-                    url: '/users.json',
-                    dataType: 'json',
+                    url: '192.164.20.1/checkPassword.php',
                     success: function(users) {
-                        for (var key in users) {
-                            if (users[key].username === username && users[key].password  === password) {
-                                $('#login').html('Connecté en tant que ' + users[key].username);
-                                $('#login').append(' (' + users[key].credits + ' crédits)');
-                                $(location).attr('href', '#home');
-                                return;
-                            }
+                        if (users) {
+                            $('#login').html('Connecté en tant que ' + users[key].username);
+                            $('#login').append(' (' + users[key].credits + ' crédits)');
+                            $(location).attr('href', '#home');
+                        } else {
+                            console.log('Erreur d\'authentification');
                         }
                     },
                     error: function(err) {
