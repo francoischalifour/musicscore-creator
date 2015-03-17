@@ -409,9 +409,6 @@
             this.key = 'C';
             this.tuning = 'standard';
 
-            this.note = '';
-            this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
-
             this.language = 'En';
             this.notesLangage = {
                 'Fr': ['La', 'Si', 'Do', 'Ré', 'Mi', 'Fa', 'Sol'],
@@ -434,6 +431,9 @@
                 '𝅘𝅥𝅱': ':64',
                 '𝅘𝅥𝅲': ':128',
             }
+
+            this.note = ':' + this.duration + ' ';
+            this.notes = ['a', 'a#', 'b', 'c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#'];
 
             this.clefs = [{
                 'name': 'Treble',
@@ -967,14 +967,31 @@
             }
 
             if (tapped.classList.contains('erase')) {
-                var str = this.note.trim();
+                var str = this.note;
                 if (this.inserted.length > 0) {
-                    var element = this.inserted.pop().trim();
+                    var element = this.inserted.pop();
 
                     if (element.indexOf('tabstave') > -1) {
                         var mesure = this.time.split('/');
                         this.duree = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
                         this.nb_mesures -= 1
+                    } else if (element.indexOf('/') > -1) {
+                        this.duree -= (1 / this.duration);
+                        if (this.duree <= 0) {
+                            var mesure = this.time.split('/');
+                            var mesure_length = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
+                            this.duree = mesure_length;
+                            this.nb_mesures -= 1;
+
+                            element = element.concat(this.inserted.pop());
+                        }
+                    } else if (element.indexOf(':') > -1) {
+                        for (var i = this.inserted.length - 1; i >= 0; i--) {
+                            if (this.inserted[i].indexOf(':') > -1) {
+                                this.duration = parseInt(this.inserted[i].substr(1, this.inserted[i].length - 1));
+                                break;
+                            }
+                        };
                     }
 
                     this.note = str.substr(0, str.length - element.length).trim();
@@ -1010,31 +1027,25 @@
                 var mesure = this.time.split('/');
                 var mesure_length = parseInt(mesure[0]) * (1 / parseInt(mesure[1]));
 
-                if (this.duree >= mesure_length) {
-                    var insert_before = (this.duree == mesure_length);
-                    if (insert_before) {
-                        this.inserted.push(character);
-                        this.note += character;
-                    }
-
-                    this.duree = 0;
+                if (this.duree > mesure_length) {
                     this.nb_mesures += 1;
 
                     if ((this.nb_mesures > 1) && (this.nb_mesures % 2 == 0)) {
                         var str = 'tabstave notation=' + this.notation + ' tablature=' + this.tablature + ' time=' + this.time + ' clef=' + this.clef + ' key=' + this.key + ' tuning=' + this.tuning;
 
-                        var str = "\n\n" + str + "\nnotes " + ':' + this.duration;
+                        var str = "\n\n" + str + "\nnotes " + ':' + this.duration + ' ';
                         this.inserted.push(str);
                         this.note += str;
 
-                        if (!insert_before) {
-                            this.inserted.push(character);
-                            this.note += character;
-                        }
+                        this.inserted.push(character);
+                        this.note += character;
 
+                        this.duree = 0 + (this.duree - mesure_length);
                         character = '';
                     } else {
-                        character = ' | ';
+                        this.duree = (1 / this.duration);
+                        this.inserted.push(' | ');
+                        this.note += ' | ';
                     }
                 }
             }
