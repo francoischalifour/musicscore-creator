@@ -29,12 +29,6 @@ var path = require('path');
  */
 var _ = require('lodash');
 
-/**
- * Import express-session
- * @type {object}
- */
-var session = require('express-session');
-
 /*
  * Loads internal dependencies.
  */
