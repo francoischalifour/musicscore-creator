@@ -29,6 +29,12 @@ var path = require('path');
  */
 var _ = require('lodash');
 
+/**
+ * Import express-session
+ * @type {object}
+ */
+var session = require('express-session');
+
 /*
  * Loads internal dependencies.
  */
@@ -125,3 +131,5 @@ app.set('port', appconfig.port || 3000);
 var server = app.listen(app.get('port'), function() {
     console.log('Listening on port ' + server.address().port + '...');
 });
+
+
