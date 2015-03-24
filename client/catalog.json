@@ -14,13 +14,19 @@
             "id": "3"
         }],
         "title": "Ma seconde partition",
-        "description": "Ceci est la première partition de USER",
+        "description": "Ceci est la première partition de Guillaume",
         "content": "tabstave notation=true tablature=false\nnotes Cn-D-E/4 F#/5"
     },
     "3": {
         "author": "2",
         "title": "Ma troisième partition",
-        "description": "Ceci est la première partition de monsieur IMBERT",
+        "description": "Ceci est la première partition de monsieur Imbert",
         "content": "tabstave notation=true tablature=false time=4/4 key=C tuning=eb\nnotes :8 C-D-E-F-G-A-B/4 C/5\ntext :8,.1,Do,Ré,Mi,.10,Fa,Sol,La,Si,.1,Do\noptions space=18"
+    },
+    "4": {
+        "author": "4",
+        "title": "Gamme de Do Majeur",
+        "description": "Petite game de Do Majeur par François",
+        "content": "ttabstave notation=true tablature=false time=4/4 clef=treble key=C tuning=standard\nnotes :4 C/4 D/4 E/4 F/4  | G/4 A/4 B/4 C/5  =|= "
     }
 }

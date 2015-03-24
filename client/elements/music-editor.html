@@ -559,7 +559,7 @@
         },
 
         /**
-         * Updates music score.
+         * Updates the music score.
          */
         updateData: function() {
             'use strict';
@@ -681,45 +681,58 @@
                 this.shadowRoot.querySelector('#toastNoRecip').show();
                 return;
             }
+
             this.shadowRoot.querySelector('#toastSending').show();
             var username = 'A user';
             var songtitle = this.songtitle || 'Music sheet';
+
             if (!this.description)
                 var description = '';
             else
                 var description = '<div style="min-height:16px"></div><div style="font-size:14px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell;">' + this.description.replace(/\n/g, "<br>") + '<div></div></span></div></div>';
+
             if (!$('.editor').val())
                 var sheetContent = '';
             else
                 var sheetContent = '<div style="min-height:16px"></div><div style="font-size:14px;display:table"><div style="display:table-row;border-bottom:4px solid #fff"><span style="display:table-cell;"><pre style="background-color: #f7f7f7;border-radius:2px;padding:6px"><code>' + $('.editor').val() + '</code></pre><div></div></span></div></div>';
+
             if (!this.message)
                 var message = '';
             else
-                var message = '<div style="min-height:16px"></div><div style="min-height:1px;background-color:#eee"></div><div style="min-height:24px"></div><div style="display:table-row"><img style="display:table-cell" width="50" src="https://ci6.googleusercontent.com/proxy/s-yPWoeSrlt6ZaoEP0RnkHoJeHLVeSoqJqjDYitG58eUv3D1-OW-h7BVqADdvJRBzR92d16tqhuflDKOtJsB3Zn_ZHZKoZOqYZC_Q1gOYVOp=s0-d-e1-ft#https://ssl.gstatic.com/s2/profiles/images/silhouette64.png" alt=""><span style="display:table-cell;vertical-align:top;padding-left:16px;font-size:13px;line-height:18px;max-width:496px;color:#262626">' + this.message.replace(/\n/g, "<br>")  + '</span></div>';
+                var message = '<div style="min-height:16px"></div><div style="min-height:1px;background-color:#eee"></div><div style="min-height:24px"></div><div style="display:table-row"><img style="display:table-cell" width="50" src="https://ci6.googleusercontent.com/proxy/s-yPWoeSrlt6ZaoEP0RnkHoJeHLVeSoqJqjDYitG58eUv3D1-OW-h7BVqADdvJRBzR92d16tqhuflDKOtJsB3Zn_ZHZKoZOqYZC_Q1gOYVOp=s0-d-e1-ft#https://ssl.gstatic.com/s2/profiles/images/silhouette64.png" alt=""><span style="display:table-cell;vertical-align:top;padding-left:16px;font-size:13px;line-height:18px;max-width:496px;color:#262626">' + this.message.replace(/\n/g, "<br>") + '</span></div>';
+
             // Prepare the music sheet converted to PDF.
             this.canvas = document.querySelector('.vex-canvas');
             this.context = this.canvas.getContext('2d');
+
             // Fill the background with white.
             this.context.globalCompositeOperation = 'destination-over';
             this.context.fillStyle = '#fff';
             this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
             // Convert to image and give a filename.
             this.img = this.canvas.toDataURL('image/jpeg', 1.0);
             this.filename = this.songtitle || 'musicscore';
+
             // Create the PDF.
             this.pdf = jsPDF();
+
             // Create music sheet information.
             this.pdf.setFontSize(22);
             this.pdf.text(25, 25, this.songtitle);
             this.pdf.setFontSize(12);
             this.pdf.setTextColor(150);
             this.pdf.text(25, 32, 'Written with MusicScore Creator');
+
             // Add the information to the PDF.
             this.pdf.addImage(this.img, 'JPEG', 24, 40);
+
             // To attach the PDF.
             this.pdfBase64 = this.pdf.output('datauristring').split(',')[1];
+
             // Stock the pointer to use in the Ajax element.
             var polymer = this;
+
             $.ajax({
                 type: 'POST',
                 url: 'https://mandrillapp.com/api/1.0/messages/send.json',
@@ -793,17 +806,16 @@
 
         /**
          * Transposes a note higher.
-         * @param  {string} type Higher
          */
-         transHigher: function() {
+        transHigher: function() {
             'use strict';
 
             var polymer = this;
             var sheet1 = $('.editor').val().split('notes');
             sheet1.forEach(function(sheetTab, nbIndex) {
-                if(nbIndex != 0) {
+                if (nbIndex != 0) {
                     var sheet = sheetTab.split('');
-                    var tabNotes = polymer.findNotes(sheet);    // tableau contenant les notes
+                    var tabNotes = polymer.findNotes(sheet); // tableau contenant les notes
                     tabNotes.forEach(function(note, indexNote) {
                         var notelc = note.toLowerCase();
 
@@ -823,17 +835,20 @@
 
             // Refresh the canvas.
             $('.editor').trigger(jQuery.Event('keyup'));
-         },
+        },
 
-         transLower: function() {
+        /**
+         * Transposes a note lower.
+         */
+        transLower: function() {
             'use strict';
 
             var polymer = this;
             var sheet1 = $('.editor').val().split('notes');
             sheet1.forEach(function(sheetTab, nbIndex) {
-                if(nbIndex != 0) {
+                if (nbIndex != 0) {
                     var sheet = sheetTab.split('');
-                    var tabNotes = polymer.findNotes(sheet);    // tableau contenant les notes
+                    var tabNotes = polymer.findNotes(sheet); // tableau contenant les notes
 
                     tabNotes.forEach(function(note, indexNote) {
                         var notelc = note.toLowerCase();
@@ -854,13 +869,13 @@
 
             // Refresh the canvas.
             $('.editor').trigger(jQuery.Event('keyup'));
-         },
+        },
 
         /**
          * Return tables with all notes to transpose.
-         * @param {string} string where we have to find the notes
+         * @param {string} string in which we have to find the notes
          */
-         findNotes: function(sheet) {
+        findNotes: function(sheet) {
             'use strict';
 
             var cpt = 0;
@@ -871,10 +886,10 @@
             sheet.forEach(function(note) {
                 //On cherche à savoir s'il s'agit d'une note de style "C#" ou "D#" par exemple
                 if (note.match('#')) {
-                    noteVerif = sheet[cpt-1]+note;
-                } else if(sheet[cpt+1] == '#') { //Est-ce qu'on s'est déjà occupé de cette note ?
+                    noteVerif = sheet[cpt - 1] + note;
+                } else if (sheet[cpt + 1] == '#') { //Est-ce qu'on s'est déjà occupé de cette note ?
                     noteVerif = 'no';
-                } else if(note == '\n' && l_notes) { // Est'ce que l'on est sur la ligne "notes: (...)"
+                } else if (note == '\n' && l_notes) { // Est'ce que l'on est sur la ligne "notes: (...)"
                     l_notes = false;
                 } else {
                     noteVerif = note;
@@ -888,28 +903,28 @@
             });
 
             return result;
-         },
+        },
 
-         /**
+        /**
          * Transposes a note.
          * @param {string} note The note to transpose
          * @param {int} note index
          * @param {int} sheet index
          * @return {string} string with the note transposed
          */
-         transpose: function(note, index, nbSheet) {
+        transpose: function(note, index, nbSheet) {
             'use strict';
 
-            var textEdit = $('.editor').val();  //texte qui va remplacer celui du textarea
-            var modif = false;                  // variable permettant de savoir si on peut procéder aux modifications
+            var textEdit = $('.editor').val(); //texte qui va remplacer celui du textarea
+            var modif = false; // variable permettant de savoir si on peut procéder aux modifications
             var position = index;
-            var p_sheet = nbSheet-1;
+            var p_sheet = nbSheet - 1;
 
             for (var i = 0; i < textEdit.length; i++) {
-                if(i > 6 && !modif) {
-                    var testif = textEdit.slice(i-6, i);
-                    if(testif == '\nnotes') {
-                        if(p_sheet == 0) {
+                if (i > 6 && !modif) {
+                    var testif = textEdit.slice(i - 6, i);
+                    if (testif == '\nnotes') {
+                        if (p_sheet == 0) {
                             modif = true;
                         } else {
                             p_sheet--;
@@ -917,14 +932,14 @@
                     }
                 }
 
-                if(modif && textEdit[i].match(/[a-g]#?b?/i)) {
-                    if(position != 0){
+                if (modif && textEdit[i].match(/[a-g]#?b?/i)) {
+                    if (position != 0) {
                         position--;
                     } else {
-                        if(textEdit[i+1] != '#' && textEdit[i+1] != 'n'){
-                            textEdit = textEdit.slice(0, i) + note + textEdit.slice(i+1);
-                         } else {
-                            textEdit = textEdit.slice(0, i) + note + textEdit.slice(i+2);
+                        if (textEdit[i + 1] != '#' && textEdit[i + 1] != 'n') {
+                            textEdit = textEdit.slice(0, i) + note + textEdit.slice(i + 1);
+                        } else {
+                            textEdit = textEdit.slice(0, i) + note + textEdit.slice(i + 2);
                         }
                         modif = false;
                     }
@@ -932,8 +947,14 @@
             };
 
             return textEdit;
-         },
+        },
 
+        /**
+         * Changes solo class element.
+         * @param  {object} element
+         * @param  {object} selector
+         * @param  {object} classInStake
+         */
         changeSoloClassElement: function(element, selector, classInStake) {
             'use strict';
 
@@ -1003,19 +1024,16 @@
                 this.note += "\n";
                 character = '';
                 this.inserted.push('');
-            }
-            else if (tapped.classList.contains('hauteur')) {
+            } else if (tapped.classList.contains('hauteur')) {
                 character = '';
                 this.async(this.changeSoloClassElement(tapped, '.hauteur.active', 'active'));
-            }
-            else if (tapped.classList.contains('duration')) {
+            } else if (tapped.classList.contains('duration')) {
                 character = this.durations[character] + ' ';
                 this.async(this.changeSoloClassElement(tapped, '.duration.active', 'active'));
 
                 var duration_str = character.trim().substr(1, character.length - 1);
                 this.duration = parseInt(duration_str);
-            }
-            else if (tapped.classList.contains('note')) {
+            } else if (tapped.classList.contains('note')) {
                 character = this.notesLangage['En'][this.notesLangage[this.language].indexOf(character)];
                 character += $(this.shadowRoot.querySelector('.hauteur.active')).html();
 
@@ -1054,6 +1072,10 @@
             this.note += character;
         },
 
+        /**
+         * Translates in french or english.
+         * @param  {object} element
+         */
         translateLanguage: function(element) {
             'use strict';
 

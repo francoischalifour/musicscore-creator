@@ -1,16 +1,21 @@
 {
     "1": {
-        "username": "Paris",
+        "username": "Michel Paris",
         "password": "pass",
         "credits": "150"
     },
     "2": {
-        "username": "Imbert",
+        "username": "Kévin Imbert",
         "password": "mdp",
         "credits": "200"
     },
     "3": {
-        "username": "user",
+        "username": "Guillaume Chanson",
+        "password": "user",
+        "credits": "200"
+    },
+    "4": {
+        "username": "François Chalifour",
         "password": "user",
         "credits": "200"
     }
