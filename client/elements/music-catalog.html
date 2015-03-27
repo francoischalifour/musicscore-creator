@@ -97,7 +97,7 @@
                     url: 'http://164.81.20.57/gestion_js/php/debiter.php',
                     success: function(err) {
                         if (err) {
-                            console.log('Erreur de débit:' + err);
+                            console.log('Erreur de débit : ' + err);
                         } else {
                             console.log('Traitement');
                         }
@@ -139,7 +139,6 @@
              * Displays a sheet.
              */
             $('.seeSheet').on('click', function(key) {
-                console.log('Aperçu partition');
                 $('#seeSheet' + key).toggle();
             });
         }
